@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { NFTStorage, File } from 'nft.storage'
@@ -14,16 +14,31 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
-import { Loader2, ArrowLeft, Upload, CloudUpload, Coins, Settings } from 'lucide-react'
+import { Loader2, ArrowLeft, Upload, CloudUpload, Coins, Settings, X, Info } from 'lucide-react'
 import Link from 'next/link'
 import { ConnectWalletButton } from '@/components/ui/connect-wallet-button'
-import { motion } from 'framer-motion'
-import { MERKLE_TREE_ADDRESS, NFT_STORAGE_API } from '@/lib/nft/constants'
+import { motion, AnimatePresence } from 'framer-motion'
+import { 
+  MERKLE_TREE_ADDRESS, 
+  NFT_STORAGE_API,
+  SERVICE_FEE_PERCENTAGE,
+  SOLANA_TRANSACTION_FEE,
+  MIN_ROYALTY_PERCENTAGE,
+  MAX_ROYALTY_PERCENTAGE,
+  DEFAULT_ROYALTY_PERCENTAGE
+} from '@/lib/nft/constants'
+import Image from 'next/image'
+import { Slider } from "@/components/ui/slider"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+
+const CREATION_FEE_PERCENTAGE = 0.002 // 0.2%
+const SOLANA_FEE = 0.000005 // Approximate Solana transaction fee in SOL
 
 export default function CreateCNFTPage() {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [image, setImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [step, setStep] = useState(1)
   const [nftUrl, setNftUrl] = useState('')
@@ -31,14 +46,35 @@ export default function CreateCNFTPage() {
   const [customApi, setCustomApi] = useState('')
   const [customCollection, setCustomCollection] = useState('')
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [royaltyPercentage, setRoyaltyPercentage] = useState(DEFAULT_ROYALTY_PERCENTAGE)
+  const [showInfoCard, setShowInfoCard] = useState(true)
   const { connected, publicKey: walletPublicKey, signTransaction } = useWallet()
   const { toast } = useToast()
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowInfoCard(false)
+    }, 15000)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setImage(new File([e.target.files[0]], e.target.files[0].name, { type: e.target.files[0].type }))
+      const file = e.target.files[0]
+      setImage(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
     }
-  }
+  }, [])
+
+  const handleRemoveImage = useCallback(() => {
+    setImage(null)
+    setImagePreview(null)
+  }, [])
 
   const uploadToNFTStorage = async () => {
     if (!image) return
@@ -76,7 +112,7 @@ export default function CreateCNFTPage() {
         addPlugin({
           name: 'Compressed NFT',
           uri: metadataUri,
-          sellerFeeBasisPoints: 500, // 5% royalty
+          sellerFeeBasisPoints: royaltyPercentage * 100, // Convert percentage to basis points
           compression: {
             compressed: true,
             tree: merkleTree,
@@ -123,8 +159,11 @@ export default function CreateCNFTPage() {
 
       // Step 2: Mint NFT
       setStep(2)
-      const nft = await mintNFT(metadataUrl)
-      setNftAddress(nft.id.toString())
+      const { nftAddress, metadataUri } = await createAndMintNFT(
+        { name, description, image: image as File, royaltyPercentage },
+        walletPublicKey.toString()
+      )
+      setNftAddress(nftAddress)
 
       toast({
         title: "Compressed NFT Created",
@@ -133,6 +172,7 @@ export default function CreateCNFTPage() {
       setName('')
       setDescription('')
       setImage(null)
+      setImagePreview(null)
       setStep(1)
     } catch (error) {
       console.error('Error creating compressed NFT:', error)
@@ -146,6 +186,16 @@ export default function CreateCNFTPage() {
     }
   }
 
+  const calculateFees = (royaltyPercentage: number) => {
+    const serviceFee = SERVICE_FEE_PERCENTAGE / 100
+    return {
+      serviceFee,
+      solanaTxFee: SOLANA_TRANSACTION_FEE,
+      totalFee: serviceFee + SOLANA_TRANSACTION_FEE,
+      royalty: royaltyPercentage
+    }
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <Link href="/" passHref>
@@ -153,6 +203,34 @@ export default function CreateCNFTPage() {
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Main
         </Button>
       </Link>
+      <AnimatePresence>
+        {showInfoCard && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="mb-4"
+          >
+            <Alert className="bg-white border border-yellow-500 dark:bg-card">
+              <Info className="h-4 w-4 text-yellow-500" />
+              <AlertTitle>Important Information</AlertTitle>
+              <AlertDescription>
+                Creating a Compressed NFT involves a service fee of {SERVICE_FEE_PERCENTAGE}% plus Solana network fees.
+                You can set custom royalties for your NFT. This info will auto-hide in 15 seconds.
+              </AlertDescription>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={() => setShowInfoCard(false)}
+              >
+                Close
+              </Button>
+            </Alert>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -188,13 +266,59 @@ export default function CreateCNFTPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="image">Upload Image</Label>
-                  <Input
-                    id="image"
-                    type="file"
-                    onChange={handleImageChange}
-                    accept="image/*"
-                    required
-                  />
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      id="image"
+                      type="file"
+                      onChange={handleImageChange}
+                      accept="image/*"
+                      required
+                      className={imagePreview ? 'hidden' : ''}
+                    />
+                    {imagePreview && (
+                      <div className="relative">
+                        <Image
+                          src={imagePreview}
+                          alt="NFT Preview"
+                          width={100}
+                          height={100}
+                          className="object-cover rounded-md"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute -top-2 -right-2"
+                          onClick={handleRemoveImage}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                    {imagePreview && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('image')?.click()}
+                      >
+                        Change Image
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="royalty">Royalty Percentage</Label>
+                  <div className="flex items-center space-x-2">
+                    <Slider
+                      id="royalty"
+                      min={MIN_ROYALTY_PERCENTAGE}
+                      max={MAX_ROYALTY_PERCENTAGE}
+                      step={0.1}
+                      value={[royaltyPercentage]}
+                      onValueChange={(value) => setRoyaltyPercentage(value[0])}
+                    />
+                    <span>{royaltyPercentage.toFixed(1)}%</span>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Button
@@ -229,6 +353,18 @@ export default function CreateCNFTPage() {
                     </div>
                   </>
                 )}
+                <div className="space-y-2">
+                  <Label>Creation Fees</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Service Fee: {SERVICE_FEE_PERCENTAGE}% + Solana Fee: {SOLANA_TRANSACTION_FEE} SOL
+                  </p>
+                  <p className="text-sm font-semibold">
+                    Total Fee: {calculateFees(royaltyPercentage).totalFee.toFixed(6)} SOL
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Royalty: {royaltyPercentage.toFixed(1)}%
+                  </p>
+                </div>
                 <Button
                   type="submit"
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
@@ -257,6 +393,7 @@ export default function CreateCNFTPage() {
           </CardContent>
         </Card>
       </motion.div>
+      <div className="h-16" /> {/* Empty space */}
       {nftUrl && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}

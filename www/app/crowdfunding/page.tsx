@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
+import { Connection, PublicKey, LAMPORTS_PER_SOL, Transaction } from '@solana/web3.js'
+import { transferSol, transferUsdc, transferBark, createAssociatedTokenAccount, transferToken } from '@/lib/solanaActions'
+import { getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferInstruction } from '@solana/spl-token'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,10 +13,24 @@ import { Textarea } from "@/components/ui/textarea"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/components/ui/use-toast"
-import { Loader2, ArrowLeft, Plus, DollarSign, Leaf, Users, AlertTriangle } from 'lucide-react'
+import { Loader2, ArrowLeft, Plus, DollarSign, Leaf, Users, AlertTriangle, LinkIcon, ImageIcon } from 'lucide-react'
 import Link from 'next/link'
 import { ConnectWalletButton } from '@/components/ui/connect-wallet-button'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
+import { 
+  SOLANA_ESCROW_PROGRAM_ID, 
+  USDC_TOKEN_ID, 
+  TOKEN_PROGRAM_ID, 
+  BARK_MINT_ADDRESS, 
+  CAMPAIGN_TREASURY_ADDRESS, 
+  SOLANA_NETWORK, 
+  CREATION_FEE_PERCENTAGE, 
+  SOLANA_EXPLORER_URL,
+  CURRENCY_ICONS
+} from '@/lib/crowdfunding/constants'
+
+const CONNECTION = new Connection(`https://api.${SOLANA_NETWORK}.solana.com`)
 
 interface Campaign {
   id: string
@@ -25,14 +42,30 @@ interface Campaign {
   endDate: Date
   category: 'Community' | 'Ecology' | 'Social' | 'Disaster Relief'
   impact: string
+  socialMediaUrl?: string
+  transactionSignature?: string
+  imageUrl: string
+  type: 'SOL' | 'USDC' | 'BARK'
+  successPercentage: number
+  escrowAddress: string
 }
 
 export default function CrowdfundingPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
-  const [newCampaign, setNewCampaign] = useState({ title: '', description: '', goal: '', category: '', impact: '' })
+  const [newCampaign, setNewCampaign] = useState({ 
+    title: '', 
+    description: '', 
+    goal: '', 
+    category: '', 
+    impact: '',
+    socialMediaUrl: '',
+    imageUrl: '',
+    type: 'SOL',
+    successPercentage: 100
+  })
   const [isLoading, setIsLoading] = useState(false)
   const [filter, setFilter] = useState('All')
-  const { connected, publicKey } = useWallet()
+  const { connected, publicKey, signTransaction } = useWallet()
   const { toast } = useToast()
 
   useEffect(() => {
@@ -44,55 +77,9 @@ export default function CrowdfundingPage() {
   const fetchCampaigns = async () => {
     setIsLoading(true)
     try {
-      // In a real application, you would fetch the actual campaigns from your backend
-      await new Promise(resolve => setTimeout(resolve, 1000)) // Simulating API call
-      const mockCampaigns: Campaign[] = [
-        {
-          id: '1',
-          title: 'BARK Blink Community Event',
-          description: 'Help us organize a community meetup for BARK Blink enthusiasts!',
-          goal: 5000,
-          raised: 3500,
-          creator: '5CreatorAddressHere...',
-          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-          category: 'Community',
-          impact: 'Strengthen community bonds and increase adoption of BARK Blink'
-        },
-        {
-          id: '2',
-          title: 'Reforestation Project',
-          description: 'Plant 10,000 trees to combat deforestation and climate change.',
-          goal: 20000,
-          raised: 15000,
-          creator: '5EcoWarriorAddressHere...',
-          endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-          category: 'Ecology',
-          impact: 'Reduce CO2 emissions and restore natural habitats'
-        },
-        {
-          id: '3',
-          title: 'Education for Underprivileged Children',
-          description: 'Provide educational resources and support for 100 underprivileged children.',
-          goal: 10000,
-          raised: 7500,
-          creator: '5EducatorAddressHere...',
-          endDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
-          category: 'Social',
-          impact: 'Improve literacy rates and future opportunities for underprivileged children'
-        },
-        {
-          id: '4',
-          title: 'Emergency Relief for Natural Disaster Victims',
-          description: 'Provide immediate aid and support to victims of recent natural disasters.',
-          goal: 50000,
-          raised: 30000,
-          creator: '5DisasterReliefOrgAddressHere...',
-          endDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-          category: 'Disaster Relief',
-          impact: 'Provide food, shelter, and medical assistance to affected communities'
-        },
-      ]
-      setCampaigns(mockCampaigns)
+      const response = await fetch('/api/campaigns')
+      const data = await response.json()
+      setCampaigns(data)
     } catch (error) {
       console.error('Error fetching campaigns:', error)
       toast({
@@ -105,9 +92,31 @@ export default function CrowdfundingPage() {
     }
   }
 
+  const createEscrowAccount = async (amount: number, type: 'SOL' | 'USDC' | 'BARK') => {
+    if (!publicKey || !signTransaction) throw new Error('Wallet not connected')
+
+    // In a real implementation, this would interact with your Solana program
+    // to create an escrow account. For now, we'll simulate it.
+    const escrowKeypair = PublicKey.unique()
+    
+    switch (type) {
+      case 'SOL':
+        await transferSol(CONNECTION, publicKey, escrowKeypair, amount * LAMPORTS_PER_SOL)
+        break
+      case 'USDC':
+        await transferUsdc(CONNECTION, publicKey, escrowKeypair, amount * 1_000_000) // USDC has 6 decimal places
+        break
+      case 'BARK':
+        await transferBark(CONNECTION, publicKey, escrowKeypair, amount * 1_000_000_000) // Assuming BARK has 9 decimal places
+        break
+    }
+
+    return escrowKeypair.toBase58()
+  }
+
   const handleCreateCampaign = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!connected || !publicKey) {
+    if (!connected || !publicKey || !signTransaction) {
       toast({
         title: "Wallet not connected",
         description: "Please connect your wallet to create a campaign.",
@@ -118,21 +127,43 @@ export default function CrowdfundingPage() {
 
     setIsLoading(true)
     try {
-      // In a real application, you would send this data to your backend
-      await new Promise(resolve => setTimeout(resolve, 1500)) // Simulating API call
-      const newCampaignData: Campaign = {
-        id: (campaigns.length + 1).toString(),
-        title: newCampaign.title,
-        description: newCampaign.description,
-        goal: parseFloat(newCampaign.goal),
-        raised: 0,
-        creator: publicKey.toBase58(),
-        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-        category: newCampaign.category as Campaign['category'],
-        impact: newCampaign.impact,
+      const goalAmount = parseFloat(newCampaign.goal)
+      const creationFee = goalAmount * CREATION_FEE_PERCENTAGE
+      const totalAmount = goalAmount + creationFee
+
+      // Create escrow account
+      const escrowAddress = await createEscrowAccount(totalAmount, newCampaign.type as 'SOL' | 'USDC' | 'BARK')
+
+      // Send campaign data to the backend
+      const response = await fetch('/api/campaigns', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...newCampaign,
+          creator: publicKey.toBase58(),
+          escrowAddress,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create campaign')
       }
-      setCampaigns([...campaigns, newCampaignData])
-      setNewCampaign({ title: '', description: '', goal: '', category: '', impact: '' })
+
+      const createdCampaign = await response.json()
+      setCampaigns([...campaigns, createdCampaign])
+      setNewCampaign({ 
+        title: '', 
+        description: '', 
+        goal: '', 
+        category: '', 
+        impact: '', 
+        socialMediaUrl: '',
+        imageUrl: '',
+        type: 'SOL',
+        successPercentage: 100
+      })
       toast({
         title: "Campaign Created",
         description: "Your crowdfunding campaign has been successfully created.",
@@ -150,7 +181,7 @@ export default function CrowdfundingPage() {
   }
 
   const handleDonate = async (campaignId: string, amount: number) => {
-    if (!connected || !publicKey) {
+    if (!connected || !publicKey || !signTransaction) {
       toast({
         title: "Wallet not connected",
         description: "Please connect your wallet to donate.",
@@ -161,18 +192,54 @@ export default function CrowdfundingPage() {
 
     setIsLoading(true)
     try {
-      // In a real application, you would send this donation to your backend
-      await new Promise(resolve => setTimeout(resolve, 1500)) // Simulating API call
-      const updatedCampaigns = campaigns.map(campaign => {
-        if (campaign.id === campaignId) {
-          return { ...campaign, raised: campaign.raised + amount }
-        }
-        return campaign
+      const campaign = campaigns.find(c => c.id === campaignId)
+      if (!campaign) throw new Error('Campaign not found')
+
+      switch (campaign.type) {
+        case 'SOL':
+          await transferSol(
+            CONNECTION,
+            publicKey,
+            new PublicKey(campaign.escrowAddress),
+            amount * LAMPORTS_PER_SOL
+          )
+          break
+        case 'USDC':
+          await transferUsdc(
+            CONNECTION,
+            publicKey,
+            new PublicKey(campaign.escrowAddress),
+            amount * 1_000_000 // USDC has 6 decimal places
+          )
+          break
+        case 'BARK':
+          await transferBark(
+            CONNECTION,
+            publicKey,
+            new PublicKey(campaign.escrowAddress),
+            amount * 1_000_000_000 // BARK has 9 decimal places
+          )
+          break
+      }
+
+      // Update the campaign's raised amount on the backend
+      const response = await fetch(`/api/campaigns/${campaignId}/donate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount }),
       })
-      setCampaigns(updatedCampaigns)
+
+      if (!response.ok) {
+        throw new Error('Failed to update campaign')
+      }
+
+      const updatedCampaign = await response.json()
+      setCampaigns(campaigns.map(c => c.id === campaignId ? updatedCampaign : c))
       toast({
         title: "Donation Successful",
-        description: `You have successfully donated ${amount} BARK to the campaign.`,
+        description: `You have successfully donated ${amount} ${campaign.type} to the campaign.`,
       })
     } catch (error) {
       console.error('Error donating:', error)
@@ -215,7 +282,7 @@ export default function CrowdfundingPage() {
       >
         <Card className="bg-white shadow-lg mb-8">
           <CardHeader>
-            <CardTitle className="text-3xl font-bold">BARK Blink Crowdfunding</CardTitle>
+            <CardTitle className="text-3xl font-bold">BARK | Crowdfunding Application</CardTitle>
             <CardDescription>Support community projects, ecological initiatives, social causes, and disaster relief efforts</CardDescription>
           </CardHeader>
           <CardContent>
@@ -249,7 +316,7 @@ export default function CrowdfundingPage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="goal">Funding Goal (BARK)</Label>
+                        <Label htmlFor="goal">Funding Goal</Label>
                         <Input
                           id="goal"
                           type="number"
@@ -262,8 +329,21 @@ export default function CrowdfundingPage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="category">Category</Label>
-                        <Select onValueChange={(value) => setNewCampaign({ ...newCampaign, category: value })}>
+                        <Label htmlFor="type">Campaign Type</Label>
+                        <Select onValueChange={(value) => setNewCampaign({ ...newCampaign, type: value as 'SOL' | 'USDC' | 'BARK' })}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select campaign type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="SOL">SOL</SelectItem>
+                            <SelectItem value="USDC">USDC</SelectItem>
+                            <SelectItem value="BARK">BARK</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                        <Select onValueChange={(value) => setNewCampaign({ ...newCampaign, category: value as Campaign['category'] })}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a category" />
                           </SelectTrigger>
@@ -285,6 +365,43 @@ export default function CrowdfundingPage() {
                           placeholder="Describe the expected impact of your campaign"
                           rows={3}
                         />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="socialMediaUrl">Social Media URL (Optional)</Label>
+                        <Input
+                          id="socialMediaUrl"
+                          type="url"
+                          value={newCampaign.socialMediaUrl}
+                          onChange={(e) => setNewCampaign({ ...newCampaign, socialMediaUrl: e.target.value })}
+                          placeholder="Enter social media URL"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="imageUrl">Campaign Image URL</Label>
+                        <Input
+                          id="imageUrl"
+                          type="url"
+                          value={newCampaign.imageUrl}
+                          onChange={(e) => setNewCampaign({ ...newCampaign, imageUrl: e.target.value })}
+                          required
+                          placeholder="Enter campaign image URL"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="successPercentage">Success Percentage</Label>
+                        <Input
+                          id="successPercentage"
+                          type="number"
+                          value={newCampaign.successPercentage}
+                          onChange={(e) => setNewCampaign({ ...newCampaign, successPercentage: parseInt(e.target.value) })}
+                          required
+                          min="1"
+                          max="100"
+                          placeholder="Enter success percentage"
+                        />
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Creation Fee: {(parseFloat(newCampaign.goal) * CREATION_FEE_PERCENTAGE).toFixed(2)} {newCampaign.type}
                       </div>
                       <Button type="submit" disabled={isLoading}>
                         {isLoading ? (
@@ -328,11 +445,29 @@ export default function CrowdfundingPage() {
                         <CardDescription>Created by: {campaign.creator}</CardDescription>
                       </CardHeader>
                       <CardContent>
+                        <div className="mb-4 relative h-48 w-full">
+                          <Image
+                            src={campaign.imageUrl}
+                            alt={campaign.title}
+                            layout="fill"
+                            objectFit="cover"
+                            className="rounded-md"
+                          />
+                        </div>
                         <p className="mb-4">{campaign.description}</p>
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span>Progress: {((campaign.raised / campaign.goal) * 100).toFixed(2)}%</span>
-                            <span>{campaign.raised} / {campaign.goal} BARK</span>
+                            <span className="flex items-center">
+                              <Image
+                                src={CURRENCY_ICONS[campaign.type]}
+                                alt={campaign.type}
+                                width={20}
+                                height={20}
+                                className="mr-1"
+                              />
+                              {campaign.raised} / {campaign.goal} {campaign.type}
+                            </span>
                           </div>
                           <Progress value={(campaign.raised / campaign.goal) * 100} />
                         </div>
@@ -341,6 +476,23 @@ export default function CrowdfundingPage() {
                         </p>
                         <p className="mt-2 text-sm font-semibold">Expected Impact:</p>
                         <p className="text-sm">{campaign.impact}</p>
+                        <p className="mt-2 text-sm font-semibold">Success Percentage: {campaign.successPercentage}%</p>
+                        {campaign.socialMediaUrl && (
+                          <div className="mt-2">
+                            <a href={campaign.socialMediaUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline flex items-center">
+                              <LinkIcon className="h-4 w-4 mr-1" />
+                              Social Media
+                            </a>
+                          </div>
+                        )}
+                        {campaign.transactionSignature && (
+                          <div className="mt-2">
+                            <a href={`${SOLANA_EXPLORER_URL}/tx/${campaign.transactionSignature}?cluster=${SOLANA_NETWORK}`} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline flex items-center">
+                              <LinkIcon className="h-4 w-4 mr-1" />
+                              View on Solana Explorer
+                            </a>
+                          </div>
+                        )}
                       </CardContent>
                       <CardFooter>
                         <form onSubmit={(e) => {
@@ -351,14 +503,14 @@ export default function CrowdfundingPage() {
                           <Input
                             name="amount"
                             type="number"
-                            placeholder="Amount to donate"
+                            placeholder={`Amount to donate (${campaign.type})`}
                             required
                             min="0"
                             step="0.01"
                           />
                           <Button type="submit" disabled={isLoading}>
                             {isLoading ? (
-                              <Loader2 className="h-4 w-4  animate-spin" />
+                              <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
                               <DollarSign className="h-4 w-4" />
                             )}

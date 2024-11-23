@@ -10,12 +10,19 @@ export const SOLANA_RPC_ENDPOINT = process.env.NEXT_PUBLIC_SOLANA_RPC_ENDPOINT |
 // Maximum number of NFTs in the collection
 export const MAX_COLLECTION_SIZE = 10000
 
-// Royalty percentage (500 basis points = 5%)
-export const ROYALTY_BASIS_POINTS = 500
+// Royalty percentage range
+export const MIN_ROYALTY_PERCENTAGE = 0
+export const MAX_ROYALTY_PERCENTAGE = 10
+export const DEFAULT_ROYALTY_PERCENTAGE = 5
+
+// Service fee percentage
+export const SERVICE_FEE_PERCENTAGE = 0.2
+
+// Solana transaction fee (approximate)
+export const SOLANA_TRANSACTION_FEE = 0.000005
 
 // Default values for NFT creation
 export const DEFAULT_NFT_SYMBOL = 'CNFT'
-export const DEFAULT_NFT_SELLER_FEE_BASIS_POINTS = 500 // 5%
 
 // IPFS gateway URL
 export const IPFS_GATEWAY_URL = 'https://ipfs.io/ipfs/'

@@ -4,12 +4,12 @@ import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { rateLimit } from '@/lib/rate-limit';
 import { z } from 'zod';
-import { mintNFT, getNFTMetadata } from '@/lib/nft';
+import { createAndMintNFT, fetchNFTMetadata } from '@/lib/nft/api';
 
 const createNFTSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(1000),
-  image: z.string().url(),
+  image: z.instanceof(File),
   attributes: z.array(z.object({
     trait_type: z.string(),
     value: z.string(),
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'NFT not found' }, { status: 404 });
       }
 
-      const onChainMetadata = await getNFTMetadata(mintAddress);
+      const onChainMetadata = await fetchNFTMetadata(mintAddress);
 
       return NextResponse.json({ ...nft, onChainMetadata });
     }
@@ -95,14 +95,17 @@ export async function POST(request: NextRequest) {
 
     const { name, description, image, attributes } = validationResult.data;
 
-    const mintAddress = await mintNFT(session.user.id, name, description, image, attributes);
+    const { nftAddress, metadataUri } = await createAndMintNFT(
+      { name, description, image, attributes },
+      session.user.id
+    );
 
     const newNFT = await prisma.nFT.create({
       data: {
         name,
         description,
-        image,
-        mintAddress,
+        image: metadataUri,
+        mintAddress: nftAddress,
         attributes: {
           create: attributes,
         },
@@ -131,3 +134,4 @@ export async function POST(request: NextRequest) {
 export const config = {
   runtime: 'edge',
 };
+

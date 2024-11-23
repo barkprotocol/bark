@@ -8,7 +8,9 @@ import {
   NFT_STORAGE_API, 
   SOLANA_RPC_ENDPOINT,
   MAX_COLLECTION_SIZE,
-  ROYALTY_BASIS_POINTS
+  MIN_ROYALTY_PERCENTAGE,
+  MAX_ROYALTY_PERCENTAGE,
+  DEFAULT_ROYALTY_PERCENTAGE
 } from './constants'
 
 // Initialize NFT.storage client
@@ -22,6 +24,7 @@ export interface NFTMetadata {
   description: string
   image: File
   attributes?: Array<{ trait_type: string; value: string }>
+  royaltyPercentage?: number
 }
 
 export async function uploadToNFTStorage(metadata: NFTMetadata): Promise<string> {
@@ -42,7 +45,8 @@ export async function uploadToNFTStorage(metadata: NFTMetadata): Promise<string>
 export async function mintCompressedNFT(
   metadataUri: string, 
   name: string, 
-  walletPublicKey: string
+  walletPublicKey: string,
+  royaltyPercentage: number = DEFAULT_ROYALTY_PERCENTAGE
 ): Promise<string> {
   try {
     if (!MERKLE_TREE_ADDRESS) {
@@ -57,12 +61,15 @@ export async function mintCompressedNFT(
 
     const merkleTree = publicKey(MERKLE_TREE_ADDRESS)
     
+    const clampedRoyaltyPercentage = Math.max(MIN_ROYALTY_PERCENTAGE, Math.min(MAX_ROYALTY_PERCENTAGE, royaltyPercentage))
+    const sellerFeeBasisPoints = Math.round(clampedRoyaltyPercentage * 100)
+
     const tx = transactionBuilder()
       .add(
         addPlugin({
           name: name,
           uri: metadataUri,
-          sellerFeeBasisPoints: ROYALTY_BASIS_POINTS,
+          sellerFeeBasisPoints: sellerFeeBasisPoints,
           compression: {
             compressed: true,
             tree: merkleTree,
@@ -89,7 +96,7 @@ export async function createAndMintNFT(
 ): Promise<{ metadataUri: string; nftAddress: string }> {
   try {
     const metadataUri = await uploadToNFTStorage(metadata)
-    const nftAddress = await mintCompressedNFT(metadataUri, metadata.name, walletPublicKey)
+    const nftAddress = await mintCompressedNFT(metadataUri, metadata.name, walletPublicKey, metadata.royaltyPercentage)
     return { metadataUri, nftAddress }
   } catch (error) {
     console.error('Error creating and minting NFT:', error)
