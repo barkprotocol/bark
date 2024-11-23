@@ -1,23 +1,29 @@
-# Use Node.js as the base image
-FROM node:16-alpine
+# Use the official Node.js 20 image as a parent image
+FROM node:20-alpine
 
-# Set working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package.json package-lock.json ./
+# Copy package.json and package-lock.json (if available)
+COPY package*.json ./
 
 # Install dependencies
-RUN pnpm install
+RUN npm ci
 
-# Copy the rest of the application code
+# Copy prisma schema
+COPY prisma ./prisma/
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Copy the rest of your app's source code
 COPY . .
 
-# Build the Next.js application
-RUN pnpm run build
+# Build your Next.js app
+RUN npm run build
 
-# Expose the application port
-EXPOSE 3000
+# Expose the port your app runs on
+EXPOSE 3001
 
-# Start the application
-CMD ["pnpm", "start"]
+# Start the app
+CMD ["npm", "start"]

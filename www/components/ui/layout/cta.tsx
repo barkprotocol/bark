@@ -1,55 +1,65 @@
 'use client'
 
 import React from 'react'
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ArrowRight } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { ArrowRight, Coins } from 'lucide-react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { useTheme } from 'next-themes'
 
-interface CTAProps {
-  onLaunchApp: () => void;
-}
+export default function CTA() {
+  const { theme } = useTheme()
 
-export function CTA({ onLaunchApp }: CTAProps) {
   return (
-    <section id="cta" className="container mx-auto px-4 py-16 sm:py-20">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="bg-white rounded-lg shadow-lg p-8 sm:p-12 text-center"
-      >
-        <div className="relative w-16 h-16 mx-auto mb-6">
-          <Image
-            src="https://ucarecdn.com/f242e5dc-8813-47b4-af80-6e6dd43945a9/barkicon.png"
-            alt=""
-            fill
-            className="object-contain"
-          />
+    <section 
+      className="w-full py-16"
+      id="cta"
+      aria-labelledby="cta-heading"
+    >
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-lg bg-white dark:bg-gray-950 p-8 sm:p-12 shadow-lg border border-border">
+          <div className="relative z-10">
+            <h2 id="cta-heading" className="text-3xl sm:text-4xl font-bold mb-6 text-center text-foreground">
+              Join the BARK Community Today
+            </h2>
+            <p className="text-center mb-10 text-muted-foreground max-w-2xl mx-auto">
+              Be part of a revolutionary platform that combines Solana blockchain technology with real-world impact. Start your journey with BARK now!
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
+              <Button 
+                asChild 
+                size="lg" 
+                className="w-full sm:w-auto transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
+              >
+                <Link href="/buy" className="flex items-center justify-center">
+                  <span className="text-base">Buy BARK</span>
+                  <Coins className="ml-2 h-5 w-5 text-brown-[#D0BFB4]" aria-hidden="true" />
+                </Link>
+              </Button>
+              <Button 
+                asChild 
+                size="lg" 
+                variant="outline" 
+                className="w-full sm:w-auto transition-all duration-300 transform hover:scale-105"
+              >
+                <Link href="/about" className="flex items-center justify-center">
+                  <span className="text-base">Learn More</span>
+                  <ArrowRight className="ml-2 h-5 w-5 text-brown-[#D0BFB4]" aria-hidden="true" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+          <div className="absolute -bottom-6 -right-6 h-40 w-40 opacity-60">
+            <Image
+              src="https://ucarecdn.com/bbc74eca-8e0d-4147-8a66-6589a55ae8d0/bark.webp"
+              alt="BARK Logo"
+              width={160}
+              height={160}
+              priority
+            />
+          </div>
         </div>
-        <h2 className="font-inter text-3xl sm:text-4xl font-bold mb-4 text-foreground">
-          Ready to Start Creating Blinks?
-        </h2>
-        <p className="font-light text-lg sm:text-xl mb-8 text-muted-foreground max-w-2xl mx-auto">
-          Join the BARK community and start creating your Blinks today! Experience the future of digital interactions on Solana.
-        </p>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Button 
-            className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all text-base px-6 py-3 rounded-md shadow-md hover:shadow-lg"
-            onClick={onLaunchApp}
-          >
-            Create Now
-            <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
-          </Button>
-        </motion.div>
-        <p className="mt-6 text-sm text-muted-foreground">
-          Start for free and upgrade anytime.
-        </p>
-      </motion.div>
+      </div>
     </section>
   )
 }
-

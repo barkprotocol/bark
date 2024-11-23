@@ -1,104 +1,158 @@
 'use client'
 
-import React from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ArrowRight, ExternalLink, Zap, Paintbrush, Code, Building2 } from 'lucide-react'
-import { motion } from "framer-motion"
-import Image from "next/image"
+import Image from 'next/image'
 import Link from 'next/link'
-import { useTheme } from 'next-themes'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowRight, FileText, ChevronDown } from 'lucide-react'
 
-interface HeroProps {
-  onLaunchApp: () => void
-}
+export default function Hero() {
+  const [showBackground, setShowBackground] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
 
-export function Hero({ onLaunchApp }: HeroProps) {
-  const { theme } = useTheme()
+  const handleScroll = useMemo(() => {
+    return () => {
+      setShowBackground(window.scrollY > 50)
+    }
+  }, [])
 
-  const fadeInUp = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.8 }
-  }
+  useEffect(() => {
+    const scrollListener = () => {
+      requestAnimationFrame(handleScroll)
+    }
 
-  const staggerChildren = {
-    animate: { transition: { staggerChildren: 0.2 } }
-  }
+    window.addEventListener('scroll', scrollListener, { passive: true })
+    return () => window.removeEventListener('scroll', scrollListener)
+  }, [handleScroll])
+
+  const scrollToContent = useCallback(() => {
+    const contentElement = document.getElementById('content')
+    if (contentElement) {
+      contentElement.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [])
 
   return (
-    <section className="relative text-center py-12 sm:py-16 md:py-20 mb-12 sm:mb-16 md:mb-20 min-h-[calc(100vh-80px)] flex flex-col justify-center overflow-hidden">
+    <section className="relative w-full h-screen flex flex-col justify-center items-center overflow-hidden" aria-labelledby="hero-heading">
       <div className="absolute inset-0 z-0">
         <Image
-          src="https://ucarecdn.com/750e9f1b-edfc-4ac8-a5b4-3286c7de98d6/barkmascottrasparentbg.png"
-          alt=""
-          layout="fill"
-          objectFit="cover"
-          quality={100}
-          className="blur-sm opacity-5"
+          src={"https://ucarecdn.com/60f6ce5e-1757-4d1e-a9a2-a895bbfcab84/barkesters.png"}
+          alt="Barkersters, representing the power and innovation of BARK"
+          fill
+          quality={85}
           priority
+          unoptimized
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
+          onLoad={() => setImageLoaded(true)}
         />
       </div>
+      
+      {!imageLoaded && (
+        <div className="absolute inset-0 bg-gray-900 z-10" aria-hidden="true" />
+      )}
+
+      <div className="absolute inset-0 bg-black/60 z-10" aria-hidden="true" />
+      
+      <AnimatePresence>
+        {showBackground && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.8 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute inset-0 bg-black z-20"
+            aria-hidden="true"
+          />
+        )}
+      </AnimatePresence>
+      
       <motion.div 
-        {...fadeInUp}
-        className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1 }}
+        className="relative z-30 flex flex-col items-center gap-4 sm:gap-6 w-full px-4 sm:px-6 lg:px-8"
       >
-        <Badge className="inline-flex items-center mb-4 sm:mb-6 text-sm font-medium bg-primary/20 text-primary px-3 py-1 rounded-full border border-primary/50">
-          <Zap className="w-4 h-4 mr-1.5" aria-hidden="true" />
-          <span>Powering the Future of Digital Interactions</span>
+        <Badge variant="secondary" className="px-2 py-1 text-xs sm:text-sm md:text-base lg:text-md xl:text-xl uppercase tracking-wider bg-gray-950/20 text-gray-200 font-medium rounded-full shadow-lg backdrop-blur-sm">
+          Introducing BARK Protocol
         </Badge>
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 sm:mb-8 text-foreground leading-tight">
-          Transform Your <span className="text-primary">Digital Experience</span> with BARK
-        </h1>
-        <p className="font-poppins text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 md:mb-10 text-foreground font-semibold max-w-4xl mx-auto">
-          Unlock the full potential of the Solana blockchain and redefine how you create, share, and monetize digital content.
-        </p>
-        <p className="text-base sm:text-lg mb-8 sm:mb-10 md:mb-12 max-w-3xl mx-auto transition-colors duration-300 ease-in-out text-muted-foreground">
-          Step into the future of digital ownership, seamlessly integrating blockchain technology into your everyday life.
-        </p>
-        <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 mb-12 sm:mb-16 md:mb-20">
-          <Button 
-            onClick={onLaunchApp}
-            className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-base sm:text-lg px-8 sm:px-10 py-4 sm:py-5 rounded-md shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-          >
-            Launch Application
-            <ArrowRight className="ml-2 h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
-          </Button>
-          <Button 
-            variant="outline" 
-            className="w-full sm:w-auto border-1 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-base sm:text-lg px-8 sm:px-10 py-4 sm:py-5 rounded-md shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+        
+        <motion.h1 
+          id="hero-heading"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-white font-bold leading-tight tracking-tighter text-center"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          style={{
+            textShadow: '0 4px 8px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 255, 255, 0.4), 0 0 60px rgba(255, 215, 0, 0.3)'
+          }}
+        >
+          The Storm of Solana
+        </motion.h1>
+        
+        <motion.p 
+          className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-yellow-400 font-medium mt-2 mb-1 text-center"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.8 }}
+          style={{
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.8)'
+          }}
+        >
+          Governance-Powered Solutions for Social Good
+        </motion.p>
+
+        <motion.p
+          className="text-sm sm:text-base md:text-lg text-white/80 max-w-3xl mx-auto mb-4 text-center"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+          style={{
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.6)'
+          }}
+        >
+          BARK Protocol integrates Solana blinks, governance with the Solana network to create a dynamic, community-powered ecosystem. By leveraging MemeFi and NFTs, we are reshaping the future of social finance, enabling disaster relief, and empowering donations through decentralized solutions.
+        </motion.p>
+        
+        <motion.div 
+          className="flex flex-col sm:flex-row gap-4 mt-4 justify-center w-full"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.8 }}
+        >
+          <Button
             asChild
+            size="lg"
+            className="w-full sm:w-auto px-8 sm:px-10 py-4 text-base sm:text-lg font-medium group bg-gradient-to-r from-yellow-400 to-brown-[#D0BFB4] text-gray-900 hover:from-brown-[#D0BFB4] hover:to-brown-[#D2BFB4] transition-all duration-300 transform hover:scale-105 shadow-[0_4px_14px_0_rgba(255,186,8,0.39)] hover:shadow-[0_6px_20px_rgba(255,186,8,0.23)] rounded-md"
           >
-            <Link href="https://whitepaper.barkprotocol.com">
-              Whitepaper
-              <ExternalLink className="ml-2 h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
+            <Link href="/pages/get-started" className="flex items-center justify-center">
+              Get Started
+              <ArrowRight className="ml-2 h-4 w-4 sm:h-6 sm:w-6 transition-transform group-hover:translate-x-1" aria-hidden="true" />
             </Link>
           </Button>
-        </div>
-        <motion.div 
-          variants={staggerChildren}
-          initial="initial"
-          animate="animate"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 text-left max-w-5xl mx-auto"
-        >
-          {[
-            { icon: Paintbrush, title: "For Content Creators", description: "Mint unique digital assets, enhance your brand presence, and engage your audience in innovative ways." },
-            { icon: Code, title: "For Developers", description: "Utilize our powerful API to build cutting-edge applications on the Solana blockchain." },
-            { icon: Building2, title: "For Businesses", description: "Implement loyalty programs, issue digital certificates, and streamline operations through blockchain technology." }
-          ].map((item, index) => (
-            <motion.div 
-              key={index}
-              variants={fadeInUp}
-              className="bg-card text-card-foreground backdrop-blur-sm p-4 sm:p-6 rounded-lg shadow-md flex flex-col items-center hover:shadow-lg transition-shadow duration-300"
-            >
-              <item.icon className="w-8 h-8 sm:w-10 sm:h-10 text-primary mb-3" aria-hidden="true" />
-              <h2 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-foreground">{item.title}</h2>
-              <p className="text-muted-foreground text-center text-sm sm:text-base">{item.description}</p>
-            </motion.div>
-          ))}
+          <Button 
+            asChild 
+            size="lg" 
+            variant="outline" 
+            className="w-full sm:w-auto px-8 sm:px-10 py-4 text-base sm:text-lg font-medium group bg-transparent border-2 border-white text-white hover:bg-white/20 transition-all duration-300 transform hover:scale-105 shadow-[0_4px_14px_0_rgba(255,255,255,0.39)] hover:shadow-[0_6px_20px_rgba(255,255,255,0.23)] rounded-md"
+          >
+            <Link href="/pages/whitepaper" className="flex items-center justify-center">
+              Whitepaper
+              <FileText className="ml-2 h-4 w-4 sm:h-6 sm:w-6 transition-transform group-hover:scale-110" aria-hidden="true" />
+            </Link>
+          </Button>
         </motion.div>
       </motion.div>
+
+      <button 
+        className="absolute bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 flex items-center justify-center z-30 text-yellow-400 text-xs sm:text-sm tracking-wide cursor-pointer hover:text-brown-[#D0BFB4] transition-colors duration-300"
+        onClick={scrollToContent}
+        aria-label="Scroll down to content"
+      >
+        <ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 animate-bounce" aria-hidden="true" />
+        <span className="ml-1">Explore more</span>
+      </button>
     </section>
   )
 }
-

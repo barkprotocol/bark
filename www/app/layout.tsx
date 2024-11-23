@@ -1,76 +1,55 @@
 import React from 'react';
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import { Inter, Syne, Poppins } from "next/font/google";
-import { ToastProvider } from '@/components/ui/toast';
-import { ThemeProvider } from 'next-themes';
-import { SolanaWalletProvider } from '@/components/providers/solana-wallet-provider';
-import { InfoBar } from '@/components/ui/layout/info-bar';
+import { Viewport } from "next";
+import { GeistSans } from "geist/font/sans";
+
+// Metadata
+import { metadata } from './metadata';
+
+// Components
+import { Header } from "@/components/ui/layout/header";
+import { Footer } from "@/components/ui/layout/footer";
+
+// Providers
+import { ThemeProvider } from "@/components/ui/theme-provider";
+import { WalletContextProvider } from "@/components/ui/wallet-provider";
+
+// Styles
 import "./styles/globals.css";
-import './styles/fonts.css'
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
-
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-});
-
-const syne = Syne({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-syne',
-});
-
-const poppins = Poppins({
-  weight: ['300', '400', '600'],
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-poppins',
-});
-
-export const metadata: Metadata = {
-  title: "BARK",
-  description: "Solana Actions & Blinks dApp",
-  icons: {
-    icon: '/favicon.ico',
-  },
+// Viewport configuration
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export { metadata };
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className="h-full">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${syne.variable} ${poppins.variable} antialiased font-sans bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col`}
-      >
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <div className="flex flex-col min-h-screen">
-            <SolanaWalletProvider>
-              <ToastProvider>
-                <InfoBar />
-                <main className="flex-grow">{children}</main>
-                <footer className="text-center py-4 bg-black text-sm text-gray-400 dark:text-gray-400">
-                  &copy; {new Date().getFullYear()} BARK Protocol. All rights reserved.
-                </footer>
-              </ToastProvider>
-            </SolanaWalletProvider>
-          </div>
-        </ThemeProvider>
+    <html lang="en" className={`${GeistSans.className} h-full`} suppressHydrationWarning>
+      <body className="bg-gray-100 dark:bg-gray-1000 text-foreground min-h-screen flex flex-col">
+        <WalletContextProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="flex flex-col min-h-screen">
+              <Header />
+              <main className="flex-1 w-full max-w-[1920px] mx-auto px-2 sm:px-0 lg:px-0 pt-20" role="main">
+                {children}
+              </main>
+              <Footer />
+            </div>
+          </ThemeProvider>
+        </WalletContextProvider>
       </body>
     </html>
   );

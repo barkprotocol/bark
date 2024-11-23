@@ -85,10 +85,10 @@ export function Footer() {
     {
       title: 'Features',
       items: [
-        { name: 'Blink Creation', href: '/pages/blink-creation' },
+        { name: 'Blink', href: '/pages/blink' },
         { name: 'DeFi', href: '/pages/defi' },
         { name: 'Payments', href: '/pages/payments' },
-        { name: 'NFT Marketplace', href: '/pages/nft-marketplace' },
+        { name: 'NFT Marketplace', href: '/pages/marketplace' },
         { name: 'Governance', href: '/pages/governance' },
       ],
     },
@@ -106,7 +106,7 @@ export function Footer() {
       items: [
         { name: 'Privacy Policy', href: '/pages/privacy-policy' },
         { name: 'Terms of Service', href: '/pages/terms-of-service' },
-        { name: 'Cookie Policy', href: '/pages/cookies' },
+        { name: 'Cookies', href: '/pages/cookies' },
         { name: 'Brand Guide', href: '/pages/brand-guide' },
       ],
     },

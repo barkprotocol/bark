@@ -1,109 +1,90 @@
-import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Zap, Send, CreditCard, Sparkles, Gift, ShoppingBag, Users, Code, ArrowRight } from 'lucide-react'
-import Link from 'next/link'
+'use client'
+
+import React, { memo } from 'react'
 import { motion } from 'framer-motion'
+import { Card, CardContent } from "@/components/ui/card"
+import { BarChart3Icon, HeartHandshakeIcon, ZapIcon, UsersIcon, WalletIcon, GlobeIcon } from 'lucide-react'
 
-interface FeatureCardProps {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  link: string;
-}
-
-const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, link }) => (
-  <motion.div
-    whileHover={{ scale: 1.05 }}
-    transition={{ type: "spring", stiffness: 300 }}
-  >
-    <Card className="h-full bg-gradient-to-br from-primary/10 to-secondary/10 border-none shadow-lg">
-      <CardHeader>
-        <div className="flex items-center space-x-2">
-          <div className="p-2 bg-primary/20 rounded-full">
-            {React.cloneElement(icon as React.ReactElement, { className: "h-6 w-6 text-primary" })}
-          </div>
-          <CardTitle className="text-lg font-semibold">{title}</CardTitle>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <CardDescription className="text-sm text-muted-foreground mb-4">{description}</CardDescription>
-        <Button asChild variant="outline" className="w-full group hover:bg-primary hover:text-primary-foreground transition-all duration-300">
-          <Link href={link}>
-            Learn More
-            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-          </Link>
-        </Button>
-      </CardContent>
-    </Card>
-  </motion.div>
-)
-
-const features: FeatureCardProps[] = [
+const features = [
   {
-    title: "Create Blinks",
-    description: "Mint unique digital assets on the Solana blockchain with ease.",
-    icon: <Zap />,
-    link: "/create"
+    name: 'Blinks',
+    description: 'Ignite change with instant micro-payments, donations. Create, share, and track your Blinks to make immediate impact.',
+    icon: ZapIcon,
   },
   {
-    title: "Send Blinks",
-    description: "Transfer your Blinks to other users seamlessly and securely.",
-    icon: <Send />,
-    link: "/send"
+    name: 'User Dashboard',
+    description: 'Visualize your charitable footprint, swap tokens to support causes in their preferred currency or token. Track contributions, analyze trends, and celebrate your growing impact.',
+    icon: BarChart3Icon,
   },
   {
-    title: "Micro-Payments",
-    description: "Facilitate quick and efficient transactions using Blinks.",
-    icon: <CreditCard />,
-    link: "/payments"
+    name: 'Social Finance',
+    description: 'Maximize your impact through social finance. Seamlessly interact with DeFi protocols to amplify your charitable contributions.',
+    icon: UsersIcon,
   },
   {
-    title: "Customize Blinks",
-    description: "Add unique attributes and metadata to make your Blinks truly special.",
-    icon: <Sparkles />,
-    link: "/customize"
+    name: 'Charity Incentives',
+    description: 'Earn rewards and incentives for your charitable actions and contributions. Boost your impact while receiving recognition.',
+    icon: HeartHandshakeIcon,
   },
   {
-    title: "Gift Blinks",
-    description: "Surprise friends and family with digital gifts that last forever.",
-    icon: <Gift />,
-    link: "/gift"
+    name: 'Disaster Relief',
+    description: 'Be a beacon of hope in times of crisis. Rapidly mobilize resources and support communities when they need it most through our efficient disaster relief system.',
+    icon: GlobeIcon,
   },
   {
-    title: "Blink Commerce",
-    description: "Create and sell merchandise tied to your unique Blinks.",
-    icon: <ShoppingBag />,
-    link: "/commerce"
+    name: 'Frictionless Payments',
+    description: 'Remove barriers to giving. Make secure, instant payments and donations with our streamlined payment system, ensuring your contributions reach their destination quickly.',
+    icon: WalletIcon,
   },
-  {
-    title: "Crowdfunding",
-    description: "Launch and support innovative projects using Blinks.",
-    icon: <Users />,
-    link: "/crowdfunding"
-  },
-  {
-    title: "Developer API",
-    description: "Integrate Blinks into your own applications with our robust API.",
-    icon: <Code />,
-    link: "/api"
-  }
 ]
 
-export default function Features() {
+const Features = memo(function Features() {
   return (
-    <section className="py-16 bg-gradient-to-b from-background to-secondary/5">
-      <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center mb-4">Unleash the Power of Blinks</h2>
-        <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-          Discover the innovative features that make BARK Blink the ultimate platform for digital asset creation and management on the Solana blockchain.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <section className="py-16" id="features" aria-labelledby="features-heading">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div 
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h2 id="features-heading" className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground">
+            Empowering Features for Social Impact
+          </h2>
+          <p className="mt-4 text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto">
+            Discover how BARK Protocol revolutionizes charitable giving and social finance.
+          </p>
+        </motion.div>
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, index) => (
-            <FeatureCard key={index} {...feature} />
+            <motion.div
+              key={feature.name}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <Card className="h-full transition-all duration-300 group bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-[0_4px_10px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_20px_rgba(0,0,0,0.06),0_6px_6px_rgba(0,0,0,0.10)] hover:translate-y-[-2px]" style={{ transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)' }}>
+                <CardContent className="p-6 sm:p-8 flex flex-col h-full">
+                  <div className="flex items-center mb-4">
+                    <feature.icon 
+                      className="h-8 w-8 text-brown-[#D0BFB4] mr-3 transition-colors duration-300 group-hover:text-brown-[#D2BFB4] dark:group-hover:text-yellow-400" 
+                      aria-hidden="true" 
+                    />
+                    <h3 className="text-lg font-semibold text-foreground transition-colors duration-300 group-hover:text-brown-[#D2BFB4] dark:group-hover:text-yellow-400">
+                      {feature.name}
+                    </h3>
+                  </div>
+                  <p className="text-base text-muted-foreground transition-colors duration-300 flex-grow mt-2 group-hover:text-foreground">
+                    {feature.description}
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
       </div>
     </section>
   )
-}
+})
+
+export default Features

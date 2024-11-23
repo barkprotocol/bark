@@ -1,111 +1,49 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useWallet } from '@solana/wallet-adapter-react'
-import { Header } from '@/components/ui/layout/header'
-import { Hero } from '@/components/ui/layout/hero'
-import Features from '@/components/ui/layout/features'
-import { Actions } from "@/components/ui/layout/actions"
-import { HowItWorks } from '@/components/ui/layout/how-it-works'
-import { CTA } from '@/components/ui/layout/cta'
-import { FAQ } from '@/components/ui/layout/faq'
-import { Newsletter } from '@/components/ui/layout/newsletter'
-import { Footer } from "@/components/ui/layout/footer"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/components/ui/use-toast"
+import React, { lazy, Suspense } from 'react'
+import { useTheme } from 'next-themes'
+import { Loader2 } from 'lucide-react'
+import Hero from "@/components/ui/layout/hero"
 
-export default function HomePage() {
-  const { connected, publicKey } = useWallet()
-  const [username, setUsername] = useState('')
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const { toast } = useToast()
+const About = lazy(() => import('@/components/ui/layout/about'))
+const Features = lazy(() => import('@/components/ui/layout/features'))
+const Tokenomics = lazy(() => import('@/components/ui/layout/tokenomics'))
+const FAQ = lazy(() => import('@/components/ui/layout/faq'))
+const CTA = lazy(() => import('@/components/ui/layout/cta'))
+const Newsletter = lazy(() => import('@/components/ui/layout/newsletter'))
 
-  useEffect(() => {
-    const storedUsername = localStorage.getItem('barkBlinkUsername')
-    if (storedUsername) {
-      setUsername(storedUsername)
-    }
-  }, [])
+const sections = [
+  { Component: About, id: 'about', label: 'About' },
+  { Component: Features, id: 'features', label: 'Features' },
+  { Component: Tokenomics, id: 'tokenomics', label: 'Tokenomics' },
+  { Component: FAQ, id: 'faq', label: 'FAQ' },
+  { Component: CTA, id: 'cta', label: 'Call to Action' },
+  { Component: Newsletter, id: 'newsletter', label: 'Newsletter' },
+]
 
-  const handleLaunchApp = () => {
-    if (connected && publicKey) {
-      setIsDialogOpen(true)
-    } else {
-      toast({
-        title: "Wallet not connected",
-        description: "Please connect your wallet to launch the app.",
-        variant: "destructive",
-      })
-    }
-  }
+function LoadingFallback() {
+  return (
+    <div className="flex justify-center items-center h-32">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  )
+}
 
-  const handleUsernameSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (username.trim()) {
-      localStorage.setItem('barkBlinkUsername', username)
-      setIsDialogOpen(false)
-      toast({
-        title: "User setup complete",
-        description: "You're all set to start using BARK BLINK!",
-      })
-    } else {
-      toast({
-        title: "Invalid username",
-        description: "Please enter a valid username.",
-        variant: "destructive",
-      })
-    }
-  }
+export default function Home() {
+  const { resolvedTheme } = useTheme()
 
   return (
-    <div className="min-h-screen font-sans bg-background text-foreground">
-      <Header />
-      <main className="container mx-auto px-4 py-8">
-        <Hero onLaunchApp={handleLaunchApp} />
-        <Features />
-        <HowItWorks />
-        <Actions />
-        <CTA onLaunchApp={handleLaunchApp} />
-        <FAQ />
-        <Newsletter />
+    <div className={`flex flex-col min-h-screen ${resolvedTheme === 'dark' ? 'bg-gray-950' : 'bg-gray-100'} text-foreground`}>
+      <Hero />
+      <main className="flex-1 flex flex-col gap-16 py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        {sections.map(({ Component, id, label }) => (
+          <section key={id} id={id} aria-label={label} className="scroll-mt-16">
+            <Suspense fallback={<LoadingFallback />}>
+              <Component />
+            </Suspense>
+          </section>
+        ))}
       </main>
-      <Footer />
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Set Your Username</DialogTitle>
-            <DialogDescription>
-              Enter a username to get started with BARK BLINK.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleUsernameSubmit}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="username" className="text-right">
-                  Username
-                </Label>
-                <Input
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="col-span-3"
-                  placeholder="Enter your username"
-                  required
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="submit">
-                Start Blinking
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

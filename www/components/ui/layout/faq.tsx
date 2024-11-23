@@ -1,111 +1,111 @@
 'use client'
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Minus } from 'lucide-react';
+import React, { useState } from 'react'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import { Card, CardContent } from "@/components/ui/card"
+import { useTheme } from 'next-themes'
 
-interface FAQItemProps {
-  question: string;
-  answer: string;
-  isOpen: boolean;
-  onToggle: () => void;
-}
+const faqItems = [
+  {
+    question: "What is BARK Protocol?",
+    answer: "BARK Protocol is a Solana blockchain-based ecosystem designed for decentralized finance, empowering users with advanced financial tools on Solana. It brings together fast transactions, user-friendly features, and a secure environment for crypto enthusiasts and DeFi newcomers alike."
+  },
+  {
+    question: "What are some practical use cases for BARK Protocol?",
+    answer: `BARK Protocol offers a versatile suite of tools for real-world impact, financial accessibility, and community engagement. Here are some key use cases:
+     - **BARK Token Utility**: The BARK token, anchored in real-world value, serves as a powerful tool for charity, disaster relief, community donations, Solana-based micro-applications ("Blinks"), alert systems, and decentralized infrastructure networks (DePIN).
+      - **Fast & Affordable Payments**: Leverage Solana's high-speed network for quick, low-cost payments, making transactions efficient and accessible worldwide.
+      - **Blinks for Quick Actions**: Use Solana's Blink technology to perform rapid on-chain actions, enabling seamless transaction signing, social finance activities, and real-time user interactions.
+      - **Charity & Social Impact**: Support social causes effortlessly with built-in charity mechanisms that streamline donations, making it easy to contribute to impactful projects.
+      - **Engagement Rewards**: Participate in unique rewards programs linked to events, contributions, and community activities, encouraging user engagement and support.
+      - **Personalized Dashboard**: Monitor and manage your charitable donations, escrowed assets, real-world (RWA) assets, and investments through an intuitive, all-in-one dashboard.
+      - **NFT & RWA Integration**: Create, trade, and manage NFTs and tokenized real-world assets on Solana, blending digital assets with tangible value for a new interactive experience.
+      - **E-commerce on Solana**: Build decentralized commerce solutions with Storm's Blinks and Solana's secure infrastructure, enhancing both digital and physical sales channels.
+      - **Decentralized Finance (DeFi)**: Access a range of DeFi solutions for lending, borrowing, and yield management, democratizing financial tools and fostering economic growth.
+      - **Governance Participation**: Engage in the protocol's decentralized governance by voting on decisions that shape its future, giving users a real voice in protocol evolution.
+      - **Developer Tools (API & SDK)**: A comprehensive SDK and API support seamless integration, making it easy for developers to build customized applications and expand the ecosystem.`
+  },
+  {
+    question: "How does the Jupiter API-based swap feature work?",
+    answer: "Through the Jupiter API integration, BARK Protocol allows users to perform token swaps at competitive rates. This means users can swap assets directly within the platform, accessing deep liquidity and optimized trading routes seamlessly."
+  },
+  {
+    question: "How can I get started with BARK Protocol?",
+    answer: "To get started, set up a compatible wallet (e.g., Phantom, Solflare or MetaMask). Then, acquire BARK tokens via supported exchanges or directly on the platform. For step-by-step help, check our 'Get Started' guide."
+  },
+  {
+    question: "What makes BARK unique?",
+    answer: "BARK is built on the high-performance Solana blockchain, designed to offer fast, secure, and scalable solutions for DeFi and beyond. Its advanced tokenomics and governance structure make it an ideal choice for decentralized applications."
+  },
+  {
+    question: "What is Action Board?",
+    answer: "Action Board is a set of Solana Blink-based mini applications, offering streamlined and secure functionalities for various on-chain actions."
+  },
+  {
+    question: "How do I participate in BARK Protocol governance?",
+    answer: "By holding BARK tokens, you can participate in the governance process. Access our governance platform to view and vote on proposals that shape the protocol's direction."
+  }
+]
 
-function FAQItem({ question, answer, isOpen, onToggle }: FAQItemProps) {
+export default function FAQ() {
+  const [expandedItems, setExpandedItems] = useState<string[]>([])
+  const { theme } = useTheme()
+
+  const toggleItem = (value: string) => {
+    setExpandedItems(prev =>
+      prev.includes(value)
+        ? prev.filter(item => item !== value)
+        : [...prev, value]
+    )
+  }
+
   return (
-    <div className="border-b border-border last:border-b-0">
-      <button
-        className="flex justify-between items-center w-full py-4 text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-lg transition-all duration-200 ease-in-out text-foreground hover:bg-muted/50"
-        onClick={onToggle}
-      >
-        <span className="font-medium text-base sm:text-lg pr-4 text-foreground">{question}</span>
-        <motion.div
-          initial={false}
-          animate={{ rotate: isOpen ? 45 : 0 }}
-          transition={{ duration: 0.2 }}
-          className="flex-shrink-0"
-        >
-          {isOpen ? (
-            <Minus className="h-5 w-5 text-primary" />
-          ) : (
-            <Plus className="h-5 w-5 text-primary" />
-          )}
-        </motion.div>
-      </button>
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.div
-            initial="collapsed"
-            animate="open"
-            exit="collapsed"
-            variants={{
-              open: { opacity: 1, height: 'auto', marginBottom: '1rem' },
-              collapsed: { opacity: 0, height: 0, marginBottom: '0' },
-            }}
-            transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
+    <section className="w-full max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+      <h2 className="text-4xl sm:text-5xl font-bold text-center text-foreground mb-4">Frequently Asked Questions</h2>
+      <p className="text-xl text-center text-muted-foreground mb-12 max-w-3xl mx-auto">
+        Find answers to common questions about BARK Protocol, its features, and how to get started.
+      </p>
+      <Card className="w-full bg-white dark:bg-gray-950 shadow-lg">
+        <CardContent className="p-6">
+          <Accordion
+            type="multiple"
+            value={expandedItems}
+            onValueChange={setExpandedItems}
+            className="w-full space-y-6"
           >
-            <div className="pb-4 text-sm sm:text-base leading-relaxed text-muted-foreground">
-              {answer}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-export function FAQ() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  const faqItems = [
-    {
-      question: "What is a BARK Blink?",
-      answer: "Using Solana Actions, you can turn any transaction into a blockchain link that can be shared anywhere on the internet — no third-party application required. Request a payment in a text message. Vote on governance in a chatroom. Buy an NFT on social media. It's all possible with BARK Blinks.",
-    },
-    {
-      question: "How do I create a Blink?",
-      answer: "To create a Blink, you need to connect your Solana wallet to BARK BLINK. Once connected, you can use our intuitive interface to create and customize your Blinks. Our platform guides you through the process, making it easy even for blockchain beginners.",
-    },
-    {
-      question: "Are compressed NFTs tradeable?",
-      answer: "Yes, Compressed NFTs (CNFT) are tradeable on the Solana network. You can send them to other users or trade them on supported marketplaces. CNFTs offer the benefits of traditional NFTs with improved efficiency and lower costs.",
-    },
-    {
-      question: "What are Merchant Blinks?",
-      answer: "BARK's Merch Blinks are special Blinks that represent physical merchandise. They can be created by sellers and purchased by buyers, who can then redeem them for physical goods. This bridges the gap between digital assets and real-world items, opening up exciting possibilities for e-commerce and collectibles.",
-    },
-    {
-      question: "How does token swapping work?",
-      answer: "Our integrated token swap feature allows you to exchange different types of tokens directly within the BARK - Blinks As A Service platform. We use decentralized exchanges to ensure the best rates and liquidity. This means you can easily manage your portfolio and take advantage of market opportunities without leaving the BARK ecosystem.",
-    },
-  ];
-
-  return (
-    <section id="faq" className="py-16 sm:py-20 bg-background">
-      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="bg-white dark:bg-card rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgba(255,255,255,0.05)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_rgba(255,255,255,0.12)] transition-shadow duration-300 ease-in-out p-6 mb-8">
-            <h2 className="font-inter text-3xl sm:text-4xl font-bold mb-2 text-center text-foreground">FAQ</h2>
-            <h3 className="font-poppins text-xl sm:text-2xl font-medium text-center text-muted-foreground">Frequently Asked Questions</h3>
-          </div>
-          <div className="space-y-4 bg-card dark:bg-card/80 rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgba(255,255,255,0.05)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_rgba(255,255,255,0.12)] transition-shadow duration-300 ease-in-out p-6">
             {faqItems.map((item, index) => (
-              <FAQItem
-                key={index}
-                question={item.question}
-                answer={item.answer}
-                isOpen={index === openIndex}
-                onToggle={() => setOpenIndex(index === openIndex ? null : index)}
-              />
+              <AccordionItem 
+                key={index} 
+                value={`item-${index}`} 
+                className="border rounded-lg bg-white dark:bg-gray-950 shadow-sm overflow-hidden"
+              >
+                <AccordionTrigger
+                  onClick={() => toggleItem(`item-${index}`)}
+                  className="text-left text-lg font-medium py-4 px-6 text-foreground hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition"
+                >
+                  <span className="font-semibold text-xl">{item.question}</span>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 py-4 bg-gray-50 dark:bg-gray-900">
+                  <div className="mt-2 space-y-2">
+                    <div 
+                      className="prose prose-sm max-w-none text-muted-foreground dark:text-muted-foreground"
+                      dangerouslySetInnerHTML={{ 
+                        __html: item.answer.replace(/\*\*(.*?)\*\*/g, '<strong class="text-brown-[#D0BFB4]">$1</strong>')
+                                              .replace(/\n\s*-\s*/g, '<br>• ')
+                      }} 
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </div>
-        </motion.div>
-      </div>
+          </Accordion>
+        </CardContent>
+      </Card>
     </section>
-  );
+  )
 }
-

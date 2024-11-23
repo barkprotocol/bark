@@ -2,99 +2,73 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { ArrowRight, Zap, Shield, Globe, Coins } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from 'next/link'
+import { Heart, Zap, Shield, Globe } from 'lucide-react'
+import { Card, CardContent } from "@/components/ui/card"
+import { useTheme } from 'next-themes'
 
-export const About: React.FC = () => {
-  const fadeInUp = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.5 }
+const features = [
+  {
+    icon: Heart,
+    title: "Charitable Giving",
+    description: "Blockchain-enabled donations with transparent fund allocation for global causes."
+  },
+  {
+    icon: Zap,
+    title: "Disaster Relief",
+    description: "Swift emergency response through efficient blockchain-based resource distribution."
+  },
+  {
+    icon: Shield,
+    title: "Secure Transactions",
+    description: "Leveraging Solana's blockchain for robust, transparent charitable transactions."
+  },
+  {
+    icon: Globe,
+    title: "Global Impact",
+    description: "Bridging donors and causes worldwide, transcending geographical limitations."
   }
+]
 
-  const features = [
-    { 
-      icon: Zap, 
-      title: "Lightning Fast", 
-      description: "Experience blazing-fast transactions on the Solana blockchain." 
-    },
-    { 
-      icon: Shield, 
-      title: "Secure", 
-      description: "Built with top-tier security measures to protect your digital assets." 
-    },
-    { 
-      icon: Globe, 
-      title: "Decentralized", 
-      description: "Enjoy the benefits of a truly decentralized ecosystem." 
-    },
-    { 
-      icon: Coins, 
-      title: "Tokenomics", 
-      description: "Innovative tokenomics designed for sustainable growth and value." 
-    }
-  ]
+export default function AboutUs() {
+  const { resolvedTheme } = useTheme()
 
   return (
-    <section className="py-16 bg-background">
+    <section className="py-16 sm:py-20" aria-labelledby="about-heading">
       <div className="container mx-auto px-4">
-        <motion.h2 
-          className="text-4xl sm:text-5xl font-bold mb-8 text-center text-foreground"
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="text-center mb-12"
         >
-          About BARK
-        </motion.h2>
-        <motion.div 
-          className="max-w-3xl mx-auto text-center mb-12"
-          {...fadeInUp}
-          transition={{ ...fadeInUp.transition, delay: 0.2 }}
-        >
-          <p className="text-xl text-muted-foreground">
-            BARK is a revolutionary protocol on the Solana blockchain, designed to empower creators, 
-            developers, and businesses. We're building the future of digital interactions, one block at a time.
+          <h2 id="about-heading" className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground mb-4">
+            Solutions
+          </h2>
+          <p className="mt-4 text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto">
+            Transforming charitable giving and disaster relief through innovative blockchain technology, 
+            establishing a transparent, efficient, and global ecosystem for maximized social impact.
           </p>
         </motion.div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
-              {...fadeInUp}
-              transition={{ ...fadeInUp.transition, delay: 0.2 + index * 0.1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card className="h-full">
-                <CardHeader>
-                  <feature.icon className="w-10 h-10 text-primary mb-4" />
-                  <CardTitle>{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{feature.description}</p>
+              <Card className="h-full transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105">
+                <CardContent className="p-5">
+                  <feature.icon className="h-6 w-6 text-brown-[#D0BFB4] mb-3" aria-hidden="true" />
+                  <h3 className="text-lg font-semibold mb-2 text-foreground">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground">{feature.description}</p>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
         </div>
-        <motion.div
-          className="text-center"
-          {...fadeInUp}
-          transition={{ ...fadeInUp.transition, delay: 0.6 }}
-        >
-          <Button 
-            asChild
-            size="lg"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            <Link href="/about">
-              Discover More About BARK
-              <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
-            </Link>
-          </Button>
-        </motion.div>
       </div>
     </section>
   )
 }
-
