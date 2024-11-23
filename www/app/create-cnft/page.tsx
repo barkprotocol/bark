@@ -3,38 +3,99 @@
 import React, { useState } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { Metaplex, walletAdapterIdentity, bundlrStorage } from '@metaplex-foundation/js'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { NFTStorage, File } from 'nft.storage'
+import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'
+import { createSignerFromKeypair, signerIdentity, publicKey, transactionBuilder, Transaction } from '@metaplex-foundation/umi'
+import { addPlugin, updatePlugin, fetchAsset, removePlugin } from '@metaplex-foundation/mpl-core'
+import { base58 } from '@metaplex-foundation/umi/serializers'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
-import { Loader2, ArrowLeft, Upload } from 'lucide-react'
+import { Loader2, ArrowLeft, Upload, CloudUpload, Coins, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { ConnectWalletButton } from '@/components/ui/connect-wallet-button'
 import { motion } from 'framer-motion'
-
-// Replace with your actual Merkle tree address
-const MERKLE_TREE_ADDRESS = 'YOUR_MERKLE_TREE_ADDRESS'
+import { MERKLE_TREE_ADDRESS, NFT_STORAGE_API } from '@/lib/nft/constants'
 
 export default function CreateCNFTPage() {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [image, setImage] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const { connected, publicKey, signTransaction } = useWallet()
+  const [step, setStep] = useState(1)
+  const [nftUrl, setNftUrl] = useState('')
+  const [nftAddress, setNftAddress] = useState('')
+  const [customApi, setCustomApi] = useState('')
+  const [customCollection, setCustomCollection] = useState('')
+  const [showAdvanced, setShowAdvanced] = useState(false)
+  const { connected, publicKey: walletPublicKey, signTransaction } = useWallet()
   const { toast } = useToast()
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0])
+      setImage(new File([e.target.files[0]], e.target.files[0].name, { type: e.target.files[0].type }))
     }
+  }
+
+  const uploadToNFTStorage = async () => {
+    if (!image) return
+
+    const nftStorage = new NFTStorage({ token: customApi || NFT_STORAGE_API })
+    
+    // Upload the image and metadata
+    const metadata = await nftStorage.store({
+      name,
+      description,
+      image,
+    })
+
+    return metadata.url
+  }
+
+  const mintNFT = async (metadataUri: string) => {
+    const treeAddress = customCollection || MERKLE_TREE_ADDRESS
+    if (!treeAddress || !walletPublicKey) {
+      throw new Error('Merkle tree address or wallet not configured')
+    }
+
+    const umi = createUmi('https://api.mainnet-beta.solana.com')
+    const signer = createSignerFromKeypair(umi, {
+      publicKey: walletPublicKey.toBase58(),
+      secretKey: new Uint8Array(0), // We don't have access to the secret key
+    })
+    umi.use(signerIdentity(signer))
+
+    const merkleTree = publicKey(treeAddress)
+    
+    // Create the compressed NFT
+    const tx = transactionBuilder()
+      .add(
+        addPlugin({
+          name: 'Compressed NFT',
+          uri: metadataUri,
+          sellerFeeBasisPoints: 500, // 5% royalty
+          compression: {
+            compressed: true,
+            tree: merkleTree,
+            limit: 10000,
+          },
+        })
+      )
+
+    const { signature } = await tx.sendAndConfirm(umi)
+    
+    // Fetch the created asset
+    const asset = await fetchAsset(umi, publicKey(base58.serialize(signature)))
+
+    return asset
   }
 
   const handleCreateCNFT = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!connected || !publicKey || !signTransaction) {
+    if (!connected || !walletPublicKey || !signTransaction) {
       toast({
         title: "Wallet not connected",
         description: "Please connect your wallet to create a compressed NFT.",
@@ -54,33 +115,16 @@ export default function CreateCNFTPage() {
 
     setIsLoading(true)
     try {
-      const connection = new Connection('https://api.mainnet-beta.solana.com')
-      const metaplex = Metaplex.make(connection)
-        .use(walletAdapterIdentity({ publicKey, signTransaction }))
-        .use(bundlrStorage())
+      // Step 1: Upload to NFT.storage
+      setStep(1)
+      const metadataUrl = await uploadToNFTStorage()
+      if (!metadataUrl) throw new Error('Failed to upload to NFT.storage')
+      setNftUrl(metadataUrl)
 
-      // Upload the image
-      const imageUrl = await metaplex.storage().upload(image)
-
-      // Create metadata
-      const { uri } = await metaplex.nfts().uploadMetadata({
-        name,
-        description,
-        image: imageUrl,
-      })
-
-      // Create the compressed NFT
-      const merkleTree = new PublicKey(MERKLE_TREE_ADDRESS)
-      const { response } = await metaplex.nfts().create({
-        uri,
-        name,
-        sellerFeeBasisPoints: 500, // 5% royalty
-        compression: {
-          compressed: true,
-          tree: merkleTree,
-          limit: 10000,
-        },
-      })
+      // Step 2: Mint NFT
+      setStep(2)
+      const nft = await mintNFT(metadataUrl)
+      setNftAddress(nft.id.toString())
 
       toast({
         title: "Compressed NFT Created",
@@ -89,6 +133,7 @@ export default function CreateCNFTPage() {
       setName('')
       setDescription('')
       setImage(null)
+      setStep(1)
     } catch (error) {
       console.error('Error creating compressed NFT:', error)
       toast({
@@ -113,7 +158,7 @@ export default function CreateCNFTPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Card className="bg-white shadow-lg">
+        <Card className="bg-card text-card-foreground">
           <CardHeader>
             <CardTitle className="text-3xl font-bold">Create Compressed NFT</CardTitle>
             <CardDescription>Mint a new compressed NFT on the Solana blockchain</CardDescription>
@@ -151,15 +196,49 @@ export default function CreateCNFTPage() {
                     required
                   />
                 </div>
+                <div className="space-y-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    className="w-full"
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    {showAdvanced ? 'Hide' : 'Show'} Advanced Options
+                  </Button>
+                </div>
+                {showAdvanced && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="customApi">Custom NFT.storage API Key (Optional)</Label>
+                      <Input
+                        id="customApi"
+                        value={customApi}
+                        onChange={(e) => setCustomApi(e.target.value)}
+                        placeholder="Enter your NFT.storage API key"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="customCollection">Custom Collection Address (Optional)</Label>
+                      <Input
+                        id="customCollection"
+                        value={customCollection}
+                        onChange={(e) => setCustomCollection(e.target.value)}
+                        placeholder="Enter your collection address"
+                      />
+                    </div>
+                  </>
+                )}
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                   disabled={isLoading || !name || !description || !image}
                 >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating...
+                      {step === 1 && "Uploading to NFT.storage..."}
+                      {step === 2 && "Minting NFT..."}
                     </>
                   ) : (
                     <>
@@ -178,6 +257,31 @@ export default function CreateCNFTPage() {
           </CardContent>
         </Card>
       </motion.div>
+      {nftUrl && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-4"
+        >
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center space-x-2 mb-2">
+                <CloudUpload className="h-5 w-5 text-primary" />
+                <span className="font-semibold">NFT.storage URL:</span>
+                <span className="text-sm break-all">{nftUrl}</span>
+              </div>
+              {nftAddress && (
+                <div className="flex items-center space-x-2">
+                  <Coins className="h-5 w-5 text-primary" />
+                  <span className="font-semibold">NFT Address:</span>
+                  <span className="text-sm break-all">{nftAddress}</span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
     </div>
   )
 }

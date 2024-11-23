@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { rateLimit } from '@/lib/rate-limit';
 import { z } from 'zod';
-import { mintNFT, getNFTMetadata } from '@/lib/solana/nft';
+import { mintNFT, getNFTMetadata } from '@/lib/nft';
 
 const createNFTSchema = z.object({
   name: z.string().min(1).max(100),

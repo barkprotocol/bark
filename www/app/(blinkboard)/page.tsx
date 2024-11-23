@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Progress } from "@/components/ui/progress"
 import debounce from 'lodash/debounce'
 import { Sidebar } from '@/components/ui/sidebar'
-import { Header } from '@/components/ui/header'
+import { Header } from '@/components/ui/layout/header'
 import {
   BarChart as RechartsBarChart,
   Bar,

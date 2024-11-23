@@ -31,7 +31,7 @@ function BlinkingText() {
           transition={{ duration: 0.3 }}
           aria-hidden="true"
         >
-          PROTOCOL
+          BLINK
         </motion.span>
       )}
     </AnimatePresence>
