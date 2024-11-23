@@ -45,7 +45,7 @@ export async function POST(
       ...safeBlinkData,
       fromPubkey: fromPubkey.slice(0, 4) + '...' + fromPubkey.slice(-4),
       toPubkey: toPubkey.slice(0, 4) + '...' + toPubkey.slice(-4)
-    })
+    }, { status: 200 })
   } catch (error) {
     console.error('Error processing Blink transfer:', error)
     if (error instanceof Error) {
@@ -54,4 +54,3 @@ export async function POST(
     return NextResponse.json({ error: 'An unexpected error occurred while processing the Blink transfer' }, { status: 500 })
   }
 }
-

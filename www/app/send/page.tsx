@@ -37,12 +37,13 @@ export default function SendBlinkPage() {
   const fetchBlinks = async () => {
     setIsLoading(true)
     try {
-      // Simulated API call to fetch user's Blinks
+      // BARK API call to fetch user's Blinks
       await new Promise(resolve => setTimeout(resolve, 1000))
       const mockBlinks: Blink[] = [
-        { id: 'blink1', name: 'Awesome Blink' },
-        { id: 'blink2', name: 'Cool Blink' },
-        { id: 'blink3', name: 'Super Blink' },
+        { id: 'donation', name: 'Donate' },
+        { id: 'nft', name: 'NFT' },
+        { id: 'gift', name: 'Gift' },
+        { id: 'governance', name: 'Governance' },
       ]
       setBlinks(mockBlinks)
     } catch (error) {

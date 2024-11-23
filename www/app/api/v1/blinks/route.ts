@@ -1,55 +1,67 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-import { createBlink } from '@/utils/solana'
-import { PublicKey } from '@solana/web3.js'
+import { createBlink, fetchBlinks, updateBlink, deleteBlink } from '@/lib/blinks/api'
+import { Blink } from '@/lib/blinks/types'
 
-const prisma = new PrismaClient()
-
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const limit = parseInt(searchParams.get('limit') || '10', 10)
-  const offset = parseInt(searchParams.get('offset') || '0', 10)
-
-  const blinks = await prisma.blink.findMany({
-    skip: offset,
-    take: limit,
-    include: { owner: true },
-  })
-
-  const total = await prisma.blink.count()
-
-  return NextResponse.json({
-    items: blinks,
-    total,
-    limit,
-    offset,
-  })
-}
-
-export async function POST(request: NextRequest) {
-  const body = await request.json()
-
-  if (!body.name || !body.description || !body.ownerAddress) {
-    return NextResponse.json({ error: 'Name, description, and owner address are required' }, { status: 400 })
-  }
-
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    const ownerPublicKey = new PublicKey(body.ownerAddress)
-    const mintAddress = await createBlink(ownerPublicKey, body.name, body.description)
-
-    const blink = await prisma.blink.create({
-      data: {
-        name: body.name,
-        description: body.description,
-        owner: { connect: { id: body.ownerAddress } },
-        mintAddress,
-        metadata: body.metadata || {},
-      },
-    })
-
-    return NextResponse.json(blink, { status: 201 })
+    const blinkData: Partial<Blink> = await request.json()
+    const newBlink = await createBlink(blinkData)
+    return NextResponse.json({ success: true, data: newBlink })
   } catch (error) {
     console.error('Error creating Blink:', error)
-    return NextResponse.json({ error: 'Failed to create Blink' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Failed to create Blink', 
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 })
+  }
+}
+
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  try {
+    const { searchParams } = new URL(request.url)
+    const owner = searchParams.get('owner')
+    const blinks = await fetchBlinks(owner || undefined)
+    return NextResponse.json({ success: true, data: blinks })
+  } catch (error) {
+    console.error('Error fetching Blinks:', error)
+    return NextResponse.json({ 
+      error: 'Failed to fetch Blinks', 
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 })
+  }
+}
+
+export async function PUT(request: NextRequest): Promise<NextResponse> {
+  try {
+    const { id, updates }: { id: string; updates: Partial<Blink> } = await request.json()
+    if (!id) {
+      return NextResponse.json({ error: 'Blink ID is required' }, { status: 400 })
+    }
+    const updatedBlink = await updateBlink(id, updates)
+    return NextResponse.json({ success: true, data: updatedBlink })
+  } catch (error) {
+    console.error('Error updating Blink:', error)
+    return NextResponse.json({ 
+      error: 'Failed to update Blink', 
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: NextRequest): Promise<NextResponse> {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    if (!id) {
+      return NextResponse.json({ error: 'Blink ID is required' }, { status: 400 })
+    }
+    await deleteBlink(id)
+    return NextResponse.json({ success: true, message: 'Blink deleted successfully' })
+  } catch (error) {
+    console.error('Error deleting Blink:', error)
+    return NextResponse.json({ 
+      error: 'Failed to delete Blink', 
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 })
   }
 }

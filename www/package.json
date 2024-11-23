@@ -1,5 +1,5 @@
 {
-  "name": "www",
+  "name": "bark-protocol",
   "description": "",
   "author": "BARK Protocol",
   "version": "0.1.0",
@@ -26,7 +26,6 @@
     "@coral-xyz/anchor": "^0.30.1",
     "@hookform/resolvers": "^3.9.1",
     "@jup-ag/api": "^6.0.30",
-    "@metaplex-foundation/js": "^0.20.1",
     "@metaplex-foundation/mpl-bubblegum": "^4.2.1",
     "@metaplex-foundation/mpl-core": "^1.1.1",
     "@metaplex-foundation/mpl-token-metadata": "^2.13.0",

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { Connection, PublicKey, LAMPORTS_PER_SOL, Transaction } from '@solana/web3.js'
-import { transferSol, transferUsdc, transferBark, createAssociatedTokenAccount, transferToken } from '@/lib/solanaActions'
+import { transferSol, transferUsdc, transferBark, createAssociatedTokenAccount, transferToken } from '@/lib/crowdfunding/actions'
 import { getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferInstruction } from '@solana/spl-token'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -19,8 +19,8 @@ import { ConnectWalletButton } from '@/components/ui/connect-wallet-button'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { 
-  SOLANA_ESCROW_PROGRAM_ID, 
-  USDC_TOKEN_ID, 
+  SOLANA_PROGRAM_ID, 
+  NEXT_PUBLIC_USDC_COIN_MINT, 
   TOKEN_PROGRAM_ID, 
   BARK_MINT_ADDRESS, 
   CAMPAIGN_TREASURY_ADDRESS, 
@@ -217,7 +217,7 @@ export default function CrowdfundingPage() {
             CONNECTION,
             publicKey,
             new PublicKey(campaign.escrowAddress),
-            amount * 1_000_000_000 // BARK has 9 decimal places
+            amount * 1_000_000_000 // Assuming BARK has 9 decimal places
           )
           break
       }
@@ -534,3 +534,4 @@ export default function CrowdfundingPage() {
     </div>
   )
 }
+

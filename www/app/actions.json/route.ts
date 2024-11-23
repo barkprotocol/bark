@@ -1,134 +1,125 @@
-import { ACTIONS_CORS_HEADERS, ActionsJson } from "@solana/actions";
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
+import { Connection, PublicKey, Transaction } from '@solana/web3.js'
+import { createBlink, updateBlink, deleteBlink, sendBark, purchaseGiftCard, redeemGiftCard } from '@/lib/blinks/api'
+import { createPaymentTransaction } from '@/lib/payments/solana'
+import { validatePaymentRequest } from '@/lib/payments/utils'
+import { SOLANA_RPC_URL } from '@/lib/payments/constants'
+import { Blink, ActionRequest, ActionResponse, PurchaseGiftCardRequest, RedeemGiftCardRequest } from '@/lib/blinks/types'
 
-export const GET = async () => {
-  const payload: ActionsJson = {
-    rules: [
-      // Blinks
-      {
-        pathPattern: "/blinks",
-        apiPath: "/api/v1/blinks?limit={limit}&offset={offset}",
-      },
-      {
-        pathPattern: "/blinks/:id",
-        apiPath: "/api/v1/blinks/{id}",
-      },
-      {
-        pathPattern: "/blinks/:id/transfer",
-        apiPath: "/api/v1/blinks/{id}/transfer",
-      },
-      {
-        pathPattern: "/blinks/create",
-        apiPath: "/api/v1/blinks/create",
-      },
+const connection = new Connection(SOLANA_RPC_URL, 'confirmed')
 
-      // NFTs
-      {
-        pathPattern: "/nfts",
-        apiPath: "/api/v1/nfts?limit={limit}&offset={offset}",
-      },
-      {
-        pathPattern: "/nfts/:id",
-        apiPath: "/api/v1/nfts/{id}",
-      },
-      {
-        pathPattern: "/nft/create",
-        apiPath: "/api/v1/nfts/create",
-      },
-      {
-        pathPattern: "/nfts/:id/mint",
-        apiPath: "/api/v1/nfts/{id}/mint",
-      },
+export async function POST(request: NextRequest): Promise<NextResponse<ActionResponse>> {
+  try {
+    const body: ActionRequest = await request.json()
+    const { action, data } = body
 
-      // Financial Operations
-      {
-        pathPattern: "/swap",
-        apiPath: "/api/v1/swap?fromToken={fromToken}&toToken={toToken}&amount={amount}",
-      },
-      {
-        pathPattern: "/payments",
-        apiPath: "/api/v1/payments",
-      },
-      {
-        pathPattern: "/donations",
-        apiPath: "/api/v1/donations",
-      },
+    switch (action) {
+      case 'createBlink':
+        return handleCreateBlink(data as Partial<Blink>)
+      case 'updateBlink':
+        return handleUpdateBlink(data as { id: string; updates: Partial<Blink> })
+      case 'deleteBlink':
+        return handleDeleteBlink(data as { id: string })
+      case 'sendBark':
+        return handleSendBark(data as { from: string; to: string; amount: number })
+      case 'purchaseGiftCard':
+        return handlePurchaseGiftCard(data as PurchaseGiftCardRequest)
+      case 'redeemGiftCard':
+        return handleRedeemGiftCard(data as RedeemGiftCardRequest)
+      default:
+        return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+    }
+  } catch (error) {
+    console.error('Error processing action:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
 
-      // Commerce
-      {
-        pathPattern: "/commerce/products",
-        apiPath: "/api/v1/commerce/products?limit={limit}&offset={offset}",
-      },
-      {
-        pathPattern: "/commerce/orders",
-        apiPath: "/api/v1/commerce/orders",
-      },
+async function handleCreateBlink(blinkData: Partial<Blink>): Promise<NextResponse<ActionResponse>> {
+  try {
+    const newBlink = await createBlink(blinkData)
+    return NextResponse.json({ success: true, data: newBlink })
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to create Blink' }, { status: 400 })
+  }
+}
 
-      // Staking
-      {
-        pathPattern: "/staking/info",
-        apiPath: "/api/v1/staking/info",
-      },
-      {
-        pathPattern: "/staking/stake",
-        apiPath: "/api/v1/staking/stake",
-      },
-      {
-        pathPattern: "/staking/unstake",
-        apiPath: "/api/v1/staking/unstake",
-      },
+async function handleUpdateBlink(data: { id: string; updates: Partial<Blink> }): Promise<NextResponse<ActionResponse>> {
+  try {
+    const updatedBlink = await updateBlink(data.id, data.updates)
+    return NextResponse.json({ success: true, data: updatedBlink })
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to update Blink' }, { status: 400 })
+  }
+}
 
-      // User Management
-      {
-        pathPattern: "/user/profile",
-        apiPath: "/api/v1/user/profile",
-      },
-      {
-        pathPattern: "/user/wallet",
-        apiPath: "/api/v1/user/wallet",
-      },
-      {
-        pathPattern: "/user/settings",
-        apiPath: "/api/v1/user/settings",
-      },
+async function handleDeleteBlink(data: { id: string }): Promise<NextResponse<ActionResponse>> {
+  try {
+    await deleteBlink(data.id)
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to delete Blink' }, { status: 400 })
+  }
+}
 
-      // Miscellaneous
-      {
-        pathPattern: "/",
-        apiPath: "/api/v1/actions",
-      },
-    ],
-    metadata: {
-      name: "BARK Blinks",
-      description: "Create, manage, and trade digital assets on the Solana blockchain",
-      icon: "https://ucarecdn.com/f242e5dc-8813-47b4-af80-6e6dd43945a9/barkicon.png",
-      website: "https://blinks.barkprotocol.net",
-      version: "1.0.0",
-      documentation: "https://docs.barkprotocol.net/blinks/api",
-      support: {
-        email: "support@barkprotocol.net",
-        x: "@bark_protocol",
-        discord: "https://discord.gg/barkprotocol",
-      },
-      legal: {
-        terms: "https://blinks.barkprotocol.net/legals/terms",
-        privacy: "https://blinks.barkprotocol.net/legals/privacy",
-      },
-    },
-  };
+async function handleSendBark(data: { from: string; to: string; amount: number }): Promise<NextResponse<ActionResponse>> {
+  const { from, to, amount } = data
 
-  return NextResponse.json(payload, {
-    headers: {
-      ...ACTIONS_CORS_HEADERS,
-      'Content-Type': 'application/json',
-    },
-  });
-};
+  // Validate the payment request
+  const validationError = validatePaymentRequest(to, amount, 'bark')
+  if (validationError) {
+    return NextResponse.json({ error: validationError }, { status: 400 })
+  }
 
-export const OPTIONS = async () => {
-  return NextResponse.json({}, {
-    headers: ACTIONS_CORS_HEADERS,
-  });
-};
+  try {
+    const fromPubkey = new PublicKey(from)
+    const toPubkey = new PublicKey(to)
 
-export const runtime = "edge";
+    // Create the payment transaction
+    const transaction = await createPaymentTransaction(fromPubkey, toPubkey, amount, 'bark')
+
+    // Simulate the transaction
+    const simulation = await connection.simulateTransaction(transaction)
+    if (simulation.value.err) {
+      return NextResponse.json({ error: 'Transaction simulation failed' }, { status: 400 })
+    }
+
+    // In a real-world scenario, you would typically return the transaction for signing on the client-side
+    // Here, we're using a simplified approach for demonstration purposes
+    const signature = await sendBark(fromPubkey, toPubkey, amount)
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        signature,
+        message: `Successfully sent ${amount} BARK from ${from} to ${to}`
+      }
+    })
+  } catch (error) {
+    console.error('Error sending BARK:', error)
+    return NextResponse.json({ error: 'Failed to send BARK' }, { status: 400 })
+  }
+}
+
+async function handlePurchaseGiftCard(data: PurchaseGiftCardRequest): Promise<NextResponse<ActionResponse>> {
+  try {
+    const result = await purchaseGiftCard(data.publicKey, data.amount)
+    return NextResponse.json({ success: true, data: result })
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to purchase gift card' }, { status: 400 })
+  }
+}
+
+async function handleRedeemGiftCard(data: RedeemGiftCardRequest): Promise<NextResponse<ActionResponse>> {
+  try {
+    const result = await redeemGiftCard(data.publicKey, data.giftCode)
+    return NextResponse.json({ success: true, data: result })
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to redeem gift card' }, { status: 400 })
+  }
+}
+
+export async function GET(): Promise<NextResponse> {
+  return NextResponse.json({ message: 'BARK Blink Actions API is running' })
+}
+

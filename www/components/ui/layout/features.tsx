@@ -53,7 +53,7 @@ const features: FeatureCardProps[] = [
     link: "/send"
   },
   {
-    title: "Micro Payments",
+    title: "Micro-Payments",
     description: "Facilitate quick and efficient transactions using Blinks.",
     icon: <CreditCard />,
     link: "/payments"

@@ -1,14 +1,15 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { PaymentForm } from '@/components/payments/payment-form'
 import { PaymentHistory } from '@/components/payments/payment-history'
+import { QRCodeModal } from '@/components/payments/qr-code-modal'
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 import { motion } from 'framer-motion'
-import { CreditCard, ArrowLeft, Wallet } from 'lucide-react'
-import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js'
+import { CreditCard, ArrowLeft, Wallet, QrCode } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ConnectWalletButton } from '@/components/ui/connect-wallet-button'
@@ -16,43 +17,37 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { SOLANA_RPC_URL, PAYMENT_METHODS } from '@/lib/payments/constants'
+import { createPaymentTransaction, sendAndConfirmTransaction } from '@/lib/payments/solana'
 
-// This would typically come from an environment variable
-const SOLANA_RPC_URL = 'https://api.devnet.solana.com'
-
-const paymentMethods = [
-  { id: 'sol', name: 'SOL', icon: 'https://ucarecdn.com/8bcc4664-01b2-4a88-85bc-9ebce234f08b/sol.png' },
-  { id: 'bark', name: 'BARK', icon: 'https://ucarecdn.com/8aa0180d-1112-4aea-8210-55b266c3fb44/bark.png' },
-  { id: 'usdc', name: 'USDC', icon: 'https://ucarecdn.com/67e17a97-f3bd-46c0-8627-e13b8b939d26/-/preview/1000x1000/' },
-]
+interface Transaction {
+  id: string;
+  recipient: string;
+  amount: number;
+  timestamp: Date;
+  paymentMethod: string;
+}
 
 export default function PaymentsPage() {
   const { connected, publicKey, sendTransaction } = useWallet()
   const { toast } = useToast()
-  const [transactions, setTransactions] = useState<Array<{
-    id: string;
-    recipient: string;
-    amount: number;
-    timestamp: Date;
-  }>>([])
+  const [transactions, setTransactions] = useState<Transaction[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('sol')
+  const [showQRCode, setShowQRCode] = useState(false)
+  const [qrCodeUrl, setQrCodeUrl] = useState('')
 
-  useEffect(() => {
-    if (connected && publicKey) {
-      fetchTransactions()
-    }
-  }, [connected, publicKey])
+  const fetchTransactions = useCallback(async () => {
+    if (!connected || !publicKey) return
 
-  const fetchTransactions = async () => {
     setIsLoading(true)
     try {
       // In a real application, you would fetch transactions from your backend or the Solana blockchain
-      // For this example, we'll use mock data
+      // This is just mock data for demonstration
       const mockTransactions = [
-        { id: '1', recipient: '7X8jbJdZh2Wi4cmM...', amount: 0.05, timestamp: new Date('2023-05-01T10:00:00') },
-        { id: '2', recipient: '3Fej7yNhJoHCmJ9X...', amount: 0.1, timestamp: new Date('2023-05-02T14:30:00') },
-        { id: '3', recipient: '9Qm5tKqoWqrFxAe7...', amount: 0.02, timestamp: new Date('2023-05-03T09:15:00') },
+        { id: '1', recipient: '7X8jbJdZh2Wi4cmM...', amount: 0.05, timestamp: new Date('2024-05-01T10:00:00'), paymentMethod: 'sol' },
+        { id: '2', recipient: '3Fej7yNhJoHCmJ9X...', amount: 10, timestamp: new Date('2024-05-02T14:30:00'), paymentMethod: 'bark' },
+        { id: '3', recipient: '9Qm5tKqoWqrFxAe7...', amount: 5, timestamp: new Date('2024-05-03T09:15:00'), paymentMethod: 'usdc' },
       ]
       setTransactions(mockTransactions)
     } catch (error) {
@@ -65,7 +60,11 @@ export default function PaymentsPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [connected, publicKey, toast])
+
+  useEffect(() => {
+    fetchTransactions()
+  }, [fetchTransactions])
 
   const handlePayment = async (recipient: string, amount: number) => {
     if (!connected || !publicKey || !sendTransaction) {
@@ -81,28 +80,16 @@ export default function PaymentsPage() {
     try {
       const connection = new Connection(SOLANA_RPC_URL, 'confirmed')
       const recipientPubkey = new PublicKey(recipient)
-      const lamports = amount * LAMPORTS_PER_SOL
-
-      const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: publicKey,
-          toPubkey: recipientPubkey,
-          lamports,
-        })
-      )
-
-      const { blockhash } = await connection.getRecentBlockhash()
-      transaction.recentBlockhash = blockhash
-      transaction.feePayer = publicKey
-
-      const signature = await sendTransaction(transaction, connection)
-      await connection.confirmTransaction(signature, 'confirmed')
+      
+      const transaction = await createPaymentTransaction(publicKey, recipientPubkey, amount, selectedPaymentMethod)
+      const signature = await sendAndConfirmTransaction(connection, transaction, sendTransaction)
 
       const newTransaction = {
         id: signature,
         recipient,
         amount,
         timestamp: new Date(),
+        paymentMethod: selectedPaymentMethod,
       }
 
       setTransactions([newTransaction, ...transactions])
@@ -115,11 +102,30 @@ export default function PaymentsPage() {
       console.error('Error sending payment:', error)
       toast({
         title: "Error",
-        description: "Failed to send payment. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to send payment. Please try again.",
         variant: "destructive",
       })
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleGenerateQRCode = async (recipient: string, amount: number) => {
+    try {
+      const response = await fetch(`/api/payments/qr-code?recipient=${recipient}&amount=${amount}&paymentMethod=${selectedPaymentMethod}`)
+      if (!response.ok) {
+        throw new Error('Failed to generate QR code')
+      }
+      const qrCodeSvg = await response.text()
+      setQrCodeUrl(`data:image/svg+xml;base64,${btoa(qrCodeSvg)}`)
+      setShowQRCode(true)
+    } catch (error) {
+      console.error('Error generating QR code:', error)
+      toast({
+        title: "Error",
+        description: "Failed to generate QR code. Please try again.",
+        variant: "destructive",
+      })
     }
   }
 
@@ -142,7 +148,7 @@ export default function PaymentsPage() {
               <div className="w-20 h-20 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
                 <CreditCard className="w-10 h-10 text-primary" />
               </div>
-              <CardTitle className="text-4xl font-bold mb-2">BARK Blink Payments</CardTitle>
+              <CardTitle className="text-4xl font-bold mb-2">Web3 Payments</CardTitle>
               <CardDescription className="text-lg max-w-2xl mx-auto">
                 Send quick and secure transactions on the Solana blockchain using BARK, SOL, or USDC.
               </CardDescription>
@@ -179,7 +185,7 @@ export default function PaymentsPage() {
                         onValueChange={setSelectedPaymentMethod}
                         className="flex flex-wrap gap-6"
                       >
-                        {paymentMethods.map((method) => (
+                        {PAYMENT_METHODS.map((method) => (
                           <div key={method.id} className="flex items-center space-x-3">
                             <RadioGroupItem value={method.id} id={method.id} />
                             <Label htmlFor={method.id} className="flex items-center space-x-3 cursor-pointer">
@@ -192,7 +198,12 @@ export default function PaymentsPage() {
                         ))}
                       </RadioGroup>
                     </div>
-                    <PaymentForm onSubmit={handlePayment} isLoading={isLoading} selectedPaymentMethod={selectedPaymentMethod} />
+                    <PaymentForm 
+                      onSubmit={handlePayment} 
+                      isLoading={isLoading} 
+                      selectedPaymentMethod={selectedPaymentMethod} 
+                      onGenerateQRCode={handleGenerateQRCode}
+                    />
                   </CardContent>
                 </Card>
               </motion.div>
@@ -227,7 +238,7 @@ export default function PaymentsPage() {
                 <Wallet className="w-16 h-16 mx-auto mb-6 text-primary/60" />
                 <h3 className="text-2xl font-semibold mb-4">Connect Your Wallet</h3>
                 <p className="text-lg text-muted-foreground mb-6 max-w-md mx-auto">
-                  Please connect your wallet to access BARK Blink Payments and start making secure transactions.
+                  Please connect your wallet to access Web3 Payments and start making secure transactions.
                 </p>
                 <ConnectWalletButton />
               </CardContent>
@@ -235,6 +246,12 @@ export default function PaymentsPage() {
           </motion.div>
         )}
       </div>
+      <QRCodeModal 
+        isOpen={showQRCode} 
+        onClose={() => setShowQRCode(false)} 
+        qrCodeUrl={qrCodeUrl} 
+        paymentMethod={selectedPaymentMethod}
+      />
     </div>
   )
 }

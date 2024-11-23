@@ -1,6 +1,6 @@
 import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferInstruction } from '@solana/spl-token'
-import { USDC_TOKEN_ID, BARK_MINT_ADDRESS } from './constants'
+import { NEXT_PUBLIC_USDC_COIN_MINT, BARK_MINT_ADDRESS } from './constants'
 
 export async function transferSol(connection: Connection, from: PublicKey, to: PublicKey, amount: number) {
   const transaction = new Transaction().add(
@@ -21,15 +21,15 @@ export async function transferSol(connection: Connection, from: PublicKey, to: P
 }
 
 export async function transferUsdc(connection: Connection, from: PublicKey, to: PublicKey, amount: number) {
-  const fromTokenAccount = await getAssociatedTokenAddress(USDC_TOKEN_ID, from)
-  const toTokenAccount = await getAssociatedTokenAddress(USDC_TOKEN_ID, to)
+  const fromTokenAccount = await getAssociatedTokenAddress(NEXT_PUBLIC_USDC_COIN_MINT, from)
+  const toTokenAccount = await getAssociatedTokenAddress(NEXT_PUBLIC_USDC_COIN_MINT, to)
 
   const transaction = new Transaction().add(
     createAssociatedTokenAccountInstruction(
       from,
       toTokenAccount,
       to,
-      USDC_TOKEN_ID
+      NEXT_PUBLIC_USDC_COIN_MINT
     ),
     createTransferInstruction(
       fromTokenAccount,
