@@ -108,7 +108,7 @@ function NavItem({ item, pathname }: { item: NavItem; pathname: string }) {
       <DropdownMenu>
         <DropdownMenuTrigger className={linkClasses}>
           {item.name}
-          <ChevronDown className="ml-1 h-4 w-4" aria-hidden="true" />
+          <ChevronDown className="ml-2 h-4 w-4" aria-hidden="true" />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="bg-background/80 backdrop-blur-sm border border-border">
           {item.children.map((child) => (

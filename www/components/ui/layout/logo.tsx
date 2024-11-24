@@ -31,8 +31,8 @@ export default function Logo() {
           <Image
             src="https://ucarecdn.com/bbc74eca-8e0d-4147-8a66-6589a55ae8d0/bark.webp"
             alt="BARK Protocol Logo"
-            width={62}
-            height={62}
+            width={52}
+            height={52}
             className="rounded-full"
             priority
             unoptimized
@@ -44,11 +44,11 @@ export default function Logo() {
           />
         )}
       </div>
-      <div className="ml-1 flex flex-col items-start">
+      <div className="ml-2 flex flex-col items-start">
         <span className="text-2xl font-bold text-foreground transition-colors duration-200 leading-none">
           BARK
         </span>
-        <span className="text-[0.7rem] font-light text-muted-foreground uppercase tracking-[0.3em] leading-none mt-1">
+        <span className="text-[0.7rem] font-light text-muted-foreground uppercase tracking-[0.13em] leading-none mt-1">
           Protocol
         </span>
       </div>

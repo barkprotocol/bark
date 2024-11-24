@@ -57,10 +57,17 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     /* Custom color scheme */
-    --brown: 27 19% 69%;  /* Replace yellow with a brown shade */
-    --brown-light: 27 19% 79%;
-    --brown-dark: 27 19% 59%;
-    --brown-foreground: 222.2 84% 4.9%;
+    --brown-50: 27 19% 92%;
+    --brown-100: 27 19% 85%;
+    --brown-200: 27 19% 75%;
+    --brown-300: 27 19% 65%;
+    --brown-400: 27 19% 55%;
+    --brown-500: 27 19% 45%;
+    --brown-600: 27 19% 35%;
+    --brown-700: 27 19% 25%;
+    --brown-800: 27 19% 15%;
+    --brown-900: 27 19% 5%;
+    --brown-950: 27 19% 2%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -102,19 +109,24 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     /* Custom color scheme */
-    --brown: 27 19% 69%;
-    --brown-light: 27 19% 79%;
-    --brown-dark: 27 19% 59%;
-    --brown-foreground: 222.2 84% 4.9%;
+    --brown-50: 27 19% 92%;
+    --brown-100: 27 19% 85%;
+    --brown-200: 27 19% 75%;
+    --brown-300: 27 19% 65%;
+    --brown-400: 27 19% 55%;
+    --brown-500: 27 19% 45%;
+    --brown-600: 27 19% 35%;
+    --brown-700: 27 19% 25%;
+    --brown-800: 27 19% 15%;
+    --brown-900: 27 19% 5%;
+    --brown-950: 27 19% 2%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }

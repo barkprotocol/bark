@@ -48,8 +48,9 @@ const solutions = [
 
 export default function Solutions() {
   return (
-    <section className="py-16 bg-muted" id="solutions" aria-labelledby="solutions-heading">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-16 bg-muted relative" id="solutions" aria-labelledby="solutions-heading">
+      <div className="absolute inset-0 bg-gradient-to-br from-brown/5 to-transparent" />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -72,17 +73,27 @@ export default function Solutions() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card className="h-full transition-all duration-300 hover:shadow-xl bg-card dark:bg-card shadow-lg hover:shadow-2xl dark:shadow-gray-900/50 hover:transform hover:scale-105">
-                <CardHeader className="p-6">
-                  <solution.icon className="w-8 h-8 text-brown-[#D0BFB4] mb-4" aria-hidden="true" />
-                  <CardTitle className="text-xl font-semibold text-primary mb-2">{solution.title}</CardTitle>
+              <Card className="h-full flex flex-col justify-between transition-all duration-300 hover:shadow-xl bg-card dark:bg-card shadow-[0_4px_14px_0_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(208,191,180,0.4)] dark:shadow-gray-900/30 dark:hover:shadow-gray-900/50 hover:transform hover:scale-105 group">
+                <CardHeader className="p-4 flex items-center">
+                  <motion.div
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.5 }}
+                    className="mr-3 bg-brown/10 p-2 rounded-full group-hover:bg-brown/20 transition-colors duration-300"
+                  >
+                    <solution.icon className="w-6 h-6 text-brown" aria-hidden="true" />
+                  </motion.div>
+                  <CardTitle className="text-xl font-semibold text-primary">{solution.title}</CardTitle>
                 </CardHeader>
-                <CardContent className="p-6 pt-0">
+                <CardContent className="px-6 pb-6 pt-2 flex flex-col justify-between flex-grow">
                   <p className="text-muted-foreground mb-4">{solution.description}</p>
-                  <Button asChild variant="default" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Button 
+                    asChild 
+                    variant="default" 
+                    className="w-full bg-brown text-brown-foreground hover:bg-brown-light transition-all duration-300 transform hover:translate-y-[-2px] hover:shadow-lg"
+                  >
                     <Link href={solution.link} className="inline-flex items-center justify-center">
                       Explore
-                      <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
                     </Link>
                   </Button>
                 </CardContent>
@@ -94,3 +105,4 @@ export default function Solutions() {
     </section>
   )
 }
+
