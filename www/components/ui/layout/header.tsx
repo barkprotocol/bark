@@ -34,8 +34,8 @@ const navItems: NavItem[] = [
       { name: 'DeFi', href: '/defi' },
       { name: 'Swap', href: '/swap' },
       { name: 'Payments', href: '/payments' },
-      { name: 'marketplace', href: '/marketplace' },
-      { name: 'clubs', href: '/clubs' },
+      { name: 'NFT marketplace', href: '/marketplace' },
+      { name: 'Members Club´s', href: '/membership' },
       { name: 'Governance', href: '/governance' },
     ]
   },
