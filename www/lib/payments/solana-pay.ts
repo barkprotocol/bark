@@ -32,4 +32,3 @@ export async function generateQRCode({ signature, transactionId, amount, fromTok
     throw new Error('Failed to generate QR code')
   }
 }
-

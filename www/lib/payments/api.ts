@@ -17,16 +17,26 @@ export async function createPayment({ buyerPublicKey, amount, fromToken }: Creat
       body: JSON.stringify({ buyerPublicKey, amount, fromToken }),
     })
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.error || 'Failed to create payment')
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create payment')
+      }
+      return data as CreatePaymentResponse;
+    } else {
+      // If the response is not JSON, read it as text
+      const text = await response.text();
+      console.error('Received non-JSON response:', text);
+      throw new Error('Received an invalid response from the server');
     }
-
-    const data: CreatePaymentResponse = await response.json()
-    return data
   } catch (error) {
     console.error('Error creating payment:', error)
-    throw new Error('Failed to create payment. Please try again.')
+    if (error instanceof Error) {
+      throw new Error(`Failed to create payment: ${error.message}`)
+    } else {
+      throw new Error('Failed to create payment. Please try again.')
+    }
   }
 }
 
@@ -47,7 +57,11 @@ export async function verifyPayment({ transactionId }: VerifyPaymentParams): Pro
     return data
   } catch (error) {
     console.error('Error verifying payment:', error)
-    throw new Error('Failed to verify payment. Please try again.')
+    if (error instanceof Error) {
+      throw new Error(`Failed to verify payment: ${error.message}`)
+    } else {
+      throw new Error('Failed to verify payment. Please try again.')
+    }
   }
 }
 
@@ -74,7 +88,11 @@ export async function fetchTokenPrice(token: TokenSymbol): Promise<number> {
     return data.price
   } catch (error) {
     console.error('Error fetching token price:', error)
-    throw new Error('Failed to fetch token price. Please try again.')
+    if (error instanceof Error) {
+      throw new Error(`Failed to fetch token price: ${error.message}`)
+    } else {
+      throw new Error('Failed to fetch token price. Please try again.')
+    }
   }
 }
 

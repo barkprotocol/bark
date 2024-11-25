@@ -86,4 +86,3 @@ export interface FetchTransactionHistoryParams {
   limit?: number
   cursor?: string
 }
-

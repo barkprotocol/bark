@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
-import { sendEmail } from '@/app/actions/send-email'
+import { sendEmail } from '@/app/api/actions/mail/send-email'
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 
 const formSchema = z.object({

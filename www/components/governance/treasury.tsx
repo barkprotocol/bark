@@ -1,153 +1,85 @@
-'use client'
-
 import React from 'react'
-import { motion } from 'framer-motion'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { VoteIcon, Users, Clock, Shield, Zap, AlertTriangle } from 'lucide-react'
-import Link from 'next/link'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { Bone, ArrowUpRight, ArrowDownLeft } from 'lucide-react'
 
-export default function Governance() {
+type Transaction = {
+  id: string
+  type: 'deposit' | 'withdrawal'
+  amount: number
+  date: string
+  description: string
+}
+
+const transactions: Transaction[] = [
+  { id: '1', type: 'deposit', amount: 500000, date: '2023-06-01', description: 'Community fund allocation' },
+  { id: '2', type: 'withdrawal', amount: 100000, date: '2023-06-15', description: 'Development grant payout' },
+  { id: '3', type: 'deposit', amount: 250000, date: '2023-06-30', description: 'Token sale proceeds' },
+  { id: '4', type: 'withdrawal', amount: 75000, date: '2023-07-05', description: 'Marketing campaign expense' },
+  { id: '5', type: 'deposit', amount: 1000000, date: '2023-07-15', description: 'Major investor contribution' },
+]
+
+export function Treasury() {
+  const treasuryBalance = transactions.reduce((sum, tx) => 
+    tx.type === 'deposit' ? sum + tx.amount : sum - tx.amount, 0
+  )
+
   return (
-    <TooltipProvider>
-      <section className="container mx-auto px-4 py-8 space-y-8" aria-labelledby="governance-title">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h2 id="governance-title" className="text-3xl font-bold mb-4 text-center">Governance</h2>
-          <p className="text-lg text-muted-foreground mb-6 text-center max-w-3xl mx-auto">
-            BARK utilizes a decentralized governance model, empowering token holders to participate in key decisions that shape the future of the ecosystem.
+    <Card className="w-full shadow-lg bg-white dark:bg-gray-800 border-t-4 border-brown-[#D0BFB4]">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+          <Bone className="mr-2 h-6 w-6 text-brown-[#D0BFB4]" />
+          BARK Treasury
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Current Balance</h3>
+          <p className="text-3xl font-bold text-brown-[#D0BFB4]">
+            {treasuryBalance.toLocaleString()} BARK
           </p>
-        </motion.div>
-
-        <Alert variant="warning" className="mb-6">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Important</AlertTitle>
-          <AlertDescription>
-            Governance participation requires holding BARK tokens. Ensure you have BARK tokens in your wallet before attempting to vote or create proposals.
-          </AlertDescription>
-        </Alert>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-xl font-semibold">
-                <VoteIcon className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
-                Voting Power
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>1 BARK token = 1 vote</li>
-                <li>Staked tokens receive 1.5x voting power</li>
-                <li>Maximum voting power cap: 4% of total supply per address</li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-xl font-semibold">
-                <Users className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
-                Proposal Creation
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Minimum 100,000 BARK tokens required to create a proposal</li>
-                <li>Proposal fee: 1,000 BARK tokens (burned upon creation)</li>
-                <li>7-day discussion period before voting begins</li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-xl font-semibold">
-                <Clock className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
-                Voting Process
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Voting period: 5 days</li>
-                <li>Quorum: 10% of circulating supply must participate</li>
-                <li>Passing threshold: 66% majority required</li>
-                <li>24-hour timelock before implementation</li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-xl font-semibold">
-                <Shield className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
-                Security Measures
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Multi-sig wallet for critical parameter changes</li>
-                <li>Emergency pause function for critical vulnerabilities</li>
-                <li>Governance Guard: 30-day lock on re-voting on failed proposals</li>
-              </ul>
-            </CardContent>
-          </Card>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center text-xl font-semibold">
-              <Zap className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
-              Governance Incentives
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              To encourage active participation in governance, BARK implements the following incentives:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-              <li>Voting Rewards: 0.01% of the vote weight in BARK tokens for participating in votes</li>
-              <li>Proposal Bonus: 5,000 BARK tokens for successfully passed proposals</li>
-              <li>Governance Staking: Additional 2% APY for tokens staked in governance</li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mt-8">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button asChild size="lg">
-                <Link href="/governance/portal">
-                  Governance Portal
-                  <VoteIcon className="ml-2 h-5 w-5 text-[#D0BFB4]" aria-hidden="true" />
-                </Link>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Access the BARK governance portal to view and participate in proposals</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button asChild size="lg" variant="outline">
-                <Link href="/governance/model">
-                  Learn More
-                  <Zap className="ml-2 h-5 w-5 text-[#D0BFB4]" aria-hidden="true" />
-                </Link>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Discover more about BARK's governance model and how to participate</p>
-            </TooltipContent>
-          </Tooltip>
+        <div>
+          <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Recent Transactions</h3>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Type</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Description</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {transactions.map((tx) => (
+                <TableRow key={tx.id}>
+                  <TableCell>
+                    <Badge 
+                      variant={tx.type === 'deposit' ? 'default' : 'destructive'}
+                      className="flex items-center w-24 justify-center"
+                    >
+                      {tx.type === 'deposit' ? (
+                        <ArrowUpRight className="mr-1 h-4 w-4" />
+                      ) : (
+                        <ArrowDownLeft className="mr-1 h-4 w-4" />
+                      )}
+                      {tx.type}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {tx.amount.toLocaleString()} BARK
+                  </TableCell>
+                  <TableCell>{tx.date}</TableCell>
+                  <TableCell>{tx.description}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
-      </section>
-    </TooltipProvider>
+      </CardContent>
+    </Card>
   )
 }
 
+export default Treasury
