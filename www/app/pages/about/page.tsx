@@ -73,7 +73,7 @@ export default function AboutContent() {
           className="relative"
         >
           <Image
-            src="/images/storm-icon-card.png"
+            src="https://ucarecdn.com/da79bf13-a326-4635-a454-e564ec6c5916/donation_bark.png"
             alt="BARK Protocol icon card showcasing the platform's features"
             width={400}
             height={400}

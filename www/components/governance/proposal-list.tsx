@@ -2,7 +2,7 @@ import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { AlertCircle, CheckCircle, XCircle, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { AlertCircle, CheckCircle, XCircle, ThumbsUp, ThumbsDown, Bone } from 'lucide-react'
 import { Progress } from "@/components/ui/progress"
 
 type Proposal = {
@@ -27,7 +27,6 @@ export default function ProposalList({ proposals }: ProposalListProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Active Proposals</h2>
       {proposals.map((proposal) => {
         const totalVotes = proposal.votesFor + proposal.votesAgainst
         const forPercentage = totalVotes > 0 ? (proposal.votesFor / totalVotes) * 100 : 0
@@ -40,7 +39,7 @@ export default function ProposalList({ proposals }: ProposalListProps) {
                   {React.createElement(statusConfig[proposal.status].icon, { className: "mr-1 h-3 w-3 inline" })}
                   {proposal.status.charAt(0).toUpperCase() + proposal.status.slice(1)}
                 </Badge>
-                <span className="text-sm text-gray-500 dark:text-gray-400">ID: {proposal.id.slice(0, 8)}...</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">ID: {proposal.id}</span>
               </div>
               <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">{proposal.title}</CardTitle>
               <CardDescription className="text-sm text-gray-600 dark:text-gray-300 mt-2">
@@ -64,8 +63,16 @@ export default function ProposalList({ proposals }: ProposalListProps) {
                   <span>{forPercentage.toFixed(2)}% For</span>
                   <span>{(100 - forPercentage).toFixed(2)}% Against</span>
                 </div>
-                <Button variant="outline" className="w-full mt-4 bg-gray-900 text-white hover:bg-gray-800 transition-colors duration-200">
-                  View Details
+                <div className="flex space-x-2">
+                  <Button variant="outline" className="flex-1 bg-green-500 text-white hover:bg-green-600 transition-colors duration-200">
+                    <ThumbsUp className="mr-2 h-4 w-4" /> Vote For
+                  </Button>
+                  <Button variant="outline" className="flex-1 bg-red-500 text-white hover:bg-red-600 transition-colors duration-200">
+                    <ThumbsDown className="mr-2 h-4 w-4" /> Vote Against
+                  </Button>
+                </div>
+                <Button variant="outline" className="w-full mt-2 bg-brown-[#D0BFB4] text-white hover:bg-brown-[#C0AF94] transition-colors duration-200">
+                  <Bone className="mr-2 h-4 w-4" /> View Details
                 </Button>
               </div>
             </CardContent>
@@ -75,3 +82,4 @@ export default function ProposalList({ proposals }: ProposalListProps) {
     </div>
   )
 }
+

@@ -7,19 +7,30 @@ import {
   BARK_TOKEN_MINT, 
   USDC_MINT,
   TOKEN_INFO
-} from '@/utils/payments/constants'
+} from '@/lib/payments/constants'
 
 export async function POST(request: Request) {
   try {
     const { amount, fromToken, buyerPublicKey } = await request.json()
 
     // Validate input
-    if (!amount || !fromToken || !buyerPublicKey) {
-      return NextResponse.json({ error: 'Invalid input: amount, fromToken, and buyerPublicKey are required' }, { status: 400 })
+    if (!amount || typeof amount !== 'number' || amount <= 0) {
+      return NextResponse.json({ error: 'Invalid amount. Must be a positive number.' }, { status: 400 })
     }
 
-    if (!['SOL', 'USDC'].includes(fromToken)) {
+    if (!fromToken || !['SOL', 'USDC'].includes(fromToken)) {
       return NextResponse.json({ error: 'Invalid fromToken. Must be SOL or USDC' }, { status: 400 })
+    }
+
+    if (!buyerPublicKey || typeof buyerPublicKey !== 'string') {
+      return NextResponse.json({ error: 'Invalid buyerPublicKey. Must be a string.' }, { status: 400 })
+    }
+
+    // Validate buyer's public key
+    try {
+      new PublicKey(buyerPublicKey)
+    } catch (error) {
+      return NextResponse.json({ error: 'Invalid buyerPublicKey format.' }, { status: 400 })
     }
 
     // Connect to Solana network
@@ -38,7 +49,7 @@ export async function POST(request: Request) {
       )
     } else {
       // For USDC, create SPL token transfer transaction
-      const tokenMintAddress = USDC_MINT
+      const tokenMintAddress = new PublicKey(USDC_MINT)
       const fromTokenAccount = await getAssociatedTokenAddress(
         tokenMintAddress,
         new PublicKey(buyerPublicKey)
@@ -61,9 +72,10 @@ export async function POST(request: Request) {
     }
 
     // Get recent blockhash
-    const { blockhash } = await connection.getLatestBlockhash()
+    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash()
     transaction.recentBlockhash = blockhash
     transaction.feePayer = new PublicKey(buyerPublicKey)
+    transaction.lastValidBlockHeight = lastValidBlockHeight
 
     // Serialize the transaction
     const serializedTransaction = transaction.serialize({
@@ -89,5 +101,6 @@ export async function POST(request: Request) {
 }
 
 function generateTransactionId(): string {
-  return 'txn_' + Math.random().toString(36).substr(2, 9)
+  return 'txn_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
 }
+

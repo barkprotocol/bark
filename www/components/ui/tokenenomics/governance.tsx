@@ -12,14 +12,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 export default function Governance() {
   return (
     <TooltipProvider>
-      <section className="space-y-8" aria-labelledby="governance-title">
+      <section className="container mx-auto px-4 py-8 space-y-8" aria-labelledby="governance-title">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h2 id="governance-title" className="text-3xl font-bold mb-4 text-foreground dark:text-white">Governance</h2>
-          <p className="text-lg text-muted-foreground mb-6">
+          <h2 id="governance-title" className="text-3xl font-bold mb-4 text-center">Governance</h2>
+          <p className="text-lg text-muted-foreground mb-6 text-center max-w-3xl mx-auto">
             BARK utilizes a decentralized governance model, empowering token holders to participate in key decisions that shape the future of the ecosystem.
           </p>
         </motion.div>
@@ -33,7 +33,7 @@ export default function Governance() {
         </Alert>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="bg-gray-100 dark:bg-gray-800">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center text-xl font-semibold">
                 <VoteIcon className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
@@ -49,7 +49,7 @@ export default function Governance() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-100 dark:bg-gray-800">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center text-xl font-semibold">
                 <Users className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
@@ -65,7 +65,7 @@ export default function Governance() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-100 dark:bg-gray-800">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center text-xl font-semibold">
                 <Clock className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
@@ -82,7 +82,7 @@ export default function Governance() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-100 dark:bg-gray-800">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center text-xl font-semibold">
                 <Shield className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
@@ -99,7 +99,7 @@ export default function Governance() {
           </Card>
         </div>
 
-        <Card className="bg-gray-100 dark:bg-gray-800 mt-8">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center text-xl font-semibold">
               <Zap className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
@@ -121,10 +121,10 @@ export default function Governance() {
         <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mt-8">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button asChild size="lg" className="bg-gray-900 hover:bg-gray-800 text-white w-full sm:w-auto">
-                <Link href="./pages/governance">
+              <Button asChild size="lg">
+                <Link href="/governance/">
                   Governance Portal
-                  <VoteIcon className="ml-2 h-5 w-5" aria-hidden="true" />
+                  <VoteIcon className="ml-2 h-5 w-5 text-[#D0BFB4]" aria-hidden="true" />
                 </Link>
               </Button>
             </TooltipTrigger>
@@ -134,10 +134,10 @@ export default function Governance() {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button asChild size="lg" variant="outline" className="bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 w-full sm:w-auto">
-                <Link href="./governance/governance-model">
-                  Learn More
-                  <Zap className="ml-2 h-5 w-5" aria-hidden="true" />
+              <Button asChild size="lg" variant="outline">
+                <Link href="/governance/governance-model">
+                  Governance Model
+                  <Zap className="ml-2 h-5 w-5 text-[#D0BFB4]" aria-hidden="true" />
                 </Link>
               </Button>
             </TooltipTrigger>
@@ -150,3 +150,4 @@ export default function Governance() {
     </TooltipProvider>
   )
 }
+

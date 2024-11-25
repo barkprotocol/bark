@@ -13,9 +13,10 @@ import { WalletButton } from '@/components/ui/wallet-button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Progress } from '@/components/ui/progress'
-import { BARK_TOKEN_MINT, USDC_MINT, TOKEN_INFO, QR_CODE_EXPIRATION_TIME } from '@/utils/payments/constants'
-import { createPayment, verifyPayment, getTokenIconUrl } from '@/utils/payments/api'
-import { generateQRCode } from '@/utils/payments/solana-pay'
+import { BARK_TOKEN_MINT, USDC_MINT, TOKEN_INFO, QR_CODE_EXPIRATION_TIME } from '@/lib/payments/constants'
+import { createPayment, verifyPayment, getTokenIconUrl } from '@/lib/payments/api'
+import { generateQRCode } from '@/lib/payments/solana-pay'
+import { useToast } from "@/components/ui/use-toast"
 
 const tokenInfo = {
   SOL: {
@@ -49,6 +50,7 @@ export function BuyContent() {
   const [transactionSignature, setTransactionSignature] = useState<string | null>(null)
   const { connection } = useConnection()
   const wallet = useWallet()
+  const { toast } = useToast()
 
   const handleReset = useCallback(() => {
     setQrCode(null)
@@ -67,13 +69,27 @@ export function BuyContent() {
       }, 1000)
     } else if (timeLeft === 0) {
       handleReset()
+      toast({
+        title: "QR Code Expired",
+        description: "The QR code has expired. Please generate a new one.",
+        variant: "destructive",
+      })
     }
     return () => clearInterval(timer)
-  }, [reference, timeLeft, handleReset])
+  }, [reference, timeLeft, handleReset, toast])
 
   const handleGenerateQR = async () => {
     if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
       setError('Please enter a valid amount')
+      return
+    }
+
+    if (!wallet.connected) {
+      toast({
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet before generating a QR code.",
+        variant: "destructive",
+      })
       return
     }
 
@@ -99,9 +115,18 @@ export function BuyContent() {
 
       setQrCode(qrCodeUrl)
       setTimeLeft(QR_CODE_EXPIRATION_TIME)
+      toast({
+        title: "QR Code Generated",
+        description: "Scan the QR code to complete your purchase.",
+      })
     } catch (error) {
       console.error('Error generating QR code:', error)
       setError(error.message || 'Failed to generate QR code. Please try again.')
+      toast({
+        title: "Error",
+        description: "Failed to generate QR code. Please try again.",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false)
     }
@@ -118,7 +143,10 @@ export function BuyContent() {
 
     try {
       const { status } = await verifyPayment({ transactionId: reference })
-      alert(`Payment status: ${status}`)
+      toast({
+        title: "Payment Verification",
+        description: `Payment status: ${status}`,
+      })
 
       if (status === 'completed') {
         handleReset()
@@ -126,6 +154,11 @@ export function BuyContent() {
     } catch (error) {
       console.error('Error verifying payment:', error)
       setError('Failed to verify payment. Please try again.')
+      toast({
+        title: "Error",
+        description: "Failed to verify payment. Please try again.",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false)
     }
@@ -134,7 +167,10 @@ export function BuyContent() {
   const handleCopyReference = () => {
     if (reference) {
       navigator.clipboard.writeText(reference)
-      alert('Reference copied to clipboard')
+      toast({
+        title: "Copied",
+        description: "Reference copied to clipboard",
+      })
     }
   }
 
@@ -292,7 +328,8 @@ export function BuyContent() {
               <InfoIcon className="h-4 w-4 text-brown-[#D0BFB4]" />
               <AlertTitle>Important</AlertTitle>
               <AlertDescription>
-                Ensure you have connected your wallet and have sufficient funds before making a purchase. Always verify transaction details before confirming.
+                Ensure you have connecte
+d your wallet and have sufficient funds before making a purchase. Always verify transaction details before confirming.
               </AlertDescription>
             </Alert>
             <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
@@ -371,4 +408,3 @@ export function BuyContent() {
     </div>
   )
 }
-

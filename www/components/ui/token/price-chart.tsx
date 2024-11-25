@@ -17,13 +17,22 @@ const PriceChart: React.FC = () => {
             <XAxis 
               dataKey="date" 
               tickFormatter={(value) => new Date(value).toLocaleDateString()}
+              stroke="hsl(var(--muted-foreground))"
             />
             <YAxis 
               tickFormatter={(value) => `$${value.toFixed(4)}`}
+              stroke="hsl(var(--muted-foreground))"
             />
             <Tooltip
               labelFormatter={(label) => new Date(label).toLocaleDateString()}
               formatter={(value: number) => [`$${value.toFixed(4)}`, 'Price']}
+              contentStyle={{
+                backgroundColor: 'hsl(var(--background))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: 'var(--radius)',
+              }}
+              labelStyle={{ color: 'hsl(var(--foreground))' }}
+              itemStyle={{ color: 'hsl(var(--foreground))' }}
             />
             <Line 
               type="monotone" 
@@ -31,6 +40,7 @@ const PriceChart: React.FC = () => {
               stroke="#D0BFB4" 
               strokeWidth={2}
               dot={false}
+              activeDot={{ r: 8 }}
             />
           </LineChart>
         </ResponsiveContainer>

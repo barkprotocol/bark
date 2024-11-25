@@ -248,6 +248,9 @@ importers:
       bs58:
         specifier: ^6.0.0
         version: 6.0.0
+      canvas-confetti:
+        specifier: ^1.9.3
+        version: 1.9.3
       chai:
         specifier: ^5.1.2
         version: 5.1.2
@@ -7289,6 +7292,9 @@ packages:
 
   caniuse-lite@1.0.30001680:
     resolution: {integrity: sha512-rPQy70G6AGUMnbwS1z6Xg+RkHYPAi18ihs47GH0jcxIG7wArmPgY3XbS2sRdBbxJljp3thdT8BIqv9ccCypiPA==}
+
+  canvas-confetti@1.9.3:
+    resolution: {integrity: sha512-rFfTURMvmVEX1gyXFgn5QMn81bYk70qa0HLzcIOSVEyl57n6o9ItHeBtUSWdvKAPY0xlvBHno4/v3QPrT83q9g==}
 
   canvg@3.0.10:
     resolution: {integrity: sha512-qwR2FRNO9NlzTeKIPIKpnTY6fqwuYSequ8Ru8c0YkYU7U0oW+hLUvWadLvAu1Rl72OMNiFhoLu4f8eUjQ7l/+Q==}
@@ -23788,6 +23794,8 @@ snapshots:
   camelcase@6.3.0: {}
 
   caniuse-lite@1.0.30001680: {}
+
+  canvas-confetti@1.9.3: {}
 
   canvg@3.0.10:
     dependencies:

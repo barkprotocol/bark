@@ -49,12 +49,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   {children}
                 </main>
                 <Footer />
+                <div className="text-center py-4 text-sm">
+                  © {new Date().getFullYear()} BARK Protocol. All rights reserved.
+                </div>
               </div>
             </TooltipProvider>
           </ThemeProvider>
         </WalletContextProvider>
       </body>
     </html>
-  );
+  )
 }
-

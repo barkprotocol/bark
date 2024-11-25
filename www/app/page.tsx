@@ -5,7 +5,7 @@ import { useTheme } from 'next-themes'
 import { Loader2 } from 'lucide-react'
 import { Hero } from "@/components/ui/layout/hero"
 
-const About = lazy(() => import('@/components/ui/layout/about'))
+const About = lazy(() => import('@/components/ui/layout/about-us'))
 const Features = lazy(() => import('@/components/ui/layout/features'))
 const Tokenomics = lazy(() => import('@/components/ui/layout/tokenomics'))
 const FAQ = lazy(() => import('@/components/ui/layout/faq'))

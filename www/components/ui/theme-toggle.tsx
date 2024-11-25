@@ -33,7 +33,7 @@ export function ThemeToggle() {
         <Button 
           variant="outline" 
           size="icon"
-          className="w-10 h-10 rounded-md bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 hover:from-gray-200 hover:to-gray-300 dark:hover:from-gray-700 dark:hover:to-gray-800 border-primary/10"
+          className="w-9 h-9 rounded-md bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 hover:from-gray-200 hover:to-gray-300 dark:hover:from-gray-700 dark:hover:to-gray-800 border-primary/10"
           aria-label="Toggle theme"
         >
           <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />

@@ -14,7 +14,7 @@ module.exports = {
     deviceSizes: [640, 768, 1024, 1280, 1600],
     imageSizes: [16, 32, 48, 64, 96],
     formats: ['image/avif', 'image/webp'],
-    minimumCacheTTL: 300,
+    minimumCacheTTL: 60, // Reduced from 300 to 60 seconds
   },
   webpack(config, { isServer }) {
     // Handle splitChunks logic
@@ -23,8 +23,8 @@ module.exports = {
     if (!disableChunking) {
       config.optimization.splitChunks = {
         chunks: 'all',
-        minSize: 30000,
-        maxSize: 1000000,
+        minSize: 20000, // Reduced from 30000
+        maxSize: 500000, // Reduced from 1000000
       };
     } else {
       config.optimization.splitChunks = false;
@@ -56,7 +56,7 @@ module.exports = {
     buildActivityPosition: 'bottom-right',
   },
   eslint: {
-    ignoreDuringBuilds: true, // Avoid breaking the build on ESLint errors during production builds
+    ignoreDuringBuilds: true,
   },
   async headers() {
     return [
@@ -69,13 +69,13 @@ module.exports = {
       {
         source: '/images/(.*)',
         headers: [
-          { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=2592000' },
+          { key: 'Cache-Control', value: 'public, max-age=3600, stale-while-revalidate=86400' },
         ],
       },
       {
         source: '/api/(.*)',
         headers: [
-          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+          { key: 'Cache-Control', value: 'no-store, must-revalidate' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
         ],
       },

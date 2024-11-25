@@ -117,7 +117,7 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({ onTokenChange }) => {
             </div>
             <p><strong>Symbol:</strong> {selectedToken.symbol}</p>
             <p><strong>Standard:</strong> {selectedToken.standard}</p>
-            <p><strong>Contract Address:</strong> {selectedToken.contractAddress}</p>
+            <p><strong>Contract Address:</strong> {selectedToken.contractAddress || 'Not available'}</p>
             <p>
               <Link 
                 href={selectedToken.explorerLink} 
@@ -126,7 +126,8 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({ onTokenChange }) => {
                 className="text-[#D0BFB4] hover:underline flex items-center"
               >
                 View on Explorer
-                <ExternalLink className="w-4 h-4 ml-1" />
+                <ExternalLink className="w-4 h-4 ml-1" aria-hidden="true" />
+                <span className="sr-only">Opens in a new tab</span>
               </Link>
             </p>
           </div>

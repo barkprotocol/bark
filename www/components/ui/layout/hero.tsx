@@ -85,8 +85,8 @@ export function Hero() {
         className="relative z-30 flex flex-col items-center gap-4 sm:gap-6 w-full px-4 sm:px-6 lg:px-8"
       >
         <Badge variant="secondary" className="px-2 py-1 text-xs sm:text-sm md:text-base uppercase tracking-wider bg-brown-[#D0BFB4]/20 text-brown-[#E5D3C8] font-medium rounded-full shadow-lg backdrop-blur-sm">
-          <PawPrint className="w-4 h-4 inline-block mr-1" />
-          Introducing BARK Protocol
+          <PawPrint className="w-4 h-4 inline-block mr-1" aria-hidden="true" />
+          <span>Introducing BARK Protocol</span>
         </Badge>
         
         <motion.h1 

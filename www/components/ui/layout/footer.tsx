@@ -75,30 +75,30 @@ export function Footer() {
     {
       title: 'Products',
       items: [
-        { name: 'Blinkboard', href: '/pages/blinkboard' },
+        { name: 'Blink', href: '/pages/action-board' },
         { name: 'Swap', href: '/pages/swap' },
         { name: 'Payments', href: '/pages/payments' },
-        { name: 'Commerce', href: '/pages/commerce' },
-        { name: 'API', href: '/pages/api' },
+        { name: 'Marketplace', href: '/pages/marketplace' },
+        { name: 'Members Club´s', href: '/pages/clubs' },
       ],
     },
     {
       title: 'Features',
       items: [
-        { name: 'Blink', href: '/pages/blink' },
-        { name: 'DeFi', href: '/pages/defi' },
-        { name: 'Payments', href: '/pages/payments' },
-        { name: 'NFT Marketplace', href: '/pages/marketplace' },
-        { name: 'Governance', href: '/pages/governance' },
+        { name: 'Blinks', href: '/pages/blink' },
+        { name: 'DeFi', href: '/defi' },
+        { name: 'Payments', href: '/payments' },
+        { name: 'NFT', href: '/pages/nft' },
+        { name: 'Governance', href: '/governance' },
       ],
     },
     {
       title: 'Support',
       items: [
         { name: 'Whitepaper', href: './pages/whitepaper' },
-        { name: 'Contact', href: '/pages/about' },
-        { name: 'API', href: '/pages/api' },
-        { name: 'Community', href: '/pages/community' },
+        { name: 'Contact', href: '/pages/contact' },
+        { name: 'Developers', href: '/developers' },
+        { name: 'API', href: '/api' },
       ],
     },
     {

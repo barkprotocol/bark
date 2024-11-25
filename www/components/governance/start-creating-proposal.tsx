@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { PlusCircle, AlertTriangle, Info } from 'lucide-react'
+import { PlusCircle, AlertTriangle, Info, Bone } from 'lucide-react'
 import { getAssociatedTokenAddress, getAccount } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 
@@ -15,9 +15,9 @@ interface StartCreatingProposalProps {
   onCreateProposal: (title: string, description: string) => Promise<void>
 }
 
-const BARK_TOKEN_MINT = new PublicKey('4DsZctdxSVNLGYB5YtY8A8JDg6tUoSZnQHSamXecKWWf') // Replace with actual BARK token mint
-const REQUIRED_TOKENS = 500000 // 500,000 tokens required
-const AUTHORITY_ADDRESS = new PublicKey('4DsZctdxSVNLGYB5YtY8A8JDg6tUoSZnQHSamXecKWWf') // Replace with actual authority address
+const BARK_TOKEN_MINT = new PublicKey('2NTvEssJ2i998V2cMGT4Fy3JhyFnAzHFonDo9dbAkVrg')
+const REQUIRED_TOKENS = 1500000 // 1,500,000 tokens required
+const AUTHORITY_ADDRESS = new PublicKey('BARKkeAwhTuFzcLHX4DjotRsmjXQ1MshGrZbn1CUQqMo')
 
 export function StartCreatingProposal({ onCreateProposal }: StartCreatingProposalProps) {
   const [title, setTitle] = useState('')
@@ -86,16 +86,19 @@ export function StartCreatingProposal({ onCreateProposal }: StartCreatingProposa
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="w-full max-w-2xl mx-auto border-t-4 border-brown-[#D0BFB4]">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Create New Proposal</CardTitle>
+        <CardTitle className="text-2xl font-bold flex items-center">
+          <Bone className="mr-2 h-6 w-6 text-brown-[#D0BFB4]" />
+          Create New Proposal
+        </CardTitle>
         <CardDescription>
           Submit a new proposal for the BARK community to vote on.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Alert className="mb-4">
-          <Info className="h-4 w-4" />
+        <Alert className="mb-4 bg-brown-100 dark:bg-brown-900 border-brown-200 dark:border-brown-800">
+          <Info className="h-4 w-4 text-brown-500 dark:text-brown-400" />
           <AlertTitle>Eligibility Requirement</AlertTitle>
           <AlertDescription>
             To create a proposal, you must either be the designated authority or hold at least 500,000 BARK tokens.
@@ -143,7 +146,7 @@ export function StartCreatingProposal({ onCreateProposal }: StartCreatingProposa
           type="submit"
           onClick={handleSubmit}
           disabled={isSubmitting || !canCreateProposal}
-          className="w-full bg-brown-[#D0BFB4] hover:bg-brown-[#D2BFB4] text-white"
+          className="w-full bg-brown-[#D0BFB4] hover:bg-brown-[#C0AF94] text-white transition-colors duration-200"
         >
           {isSubmitting ? (
             <>

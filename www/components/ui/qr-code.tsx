@@ -1,15 +1,17 @@
 "use client";
 
 import { createSolanaQR, encodeURL } from "@solana/actions";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 
-type ComponentProps = {
+interface SolanaQRCodeProps {
   url: string | URL;
   className?: string;
   background?: string;
   color?: string;
   size?: number;
-};
+}
 
 export function SolanaQRCode({
   url,
@@ -17,25 +19,52 @@ export function SolanaQRCode({
   background = "transparent",
   color,
   size = 400,
-}: ComponentProps) {
+}: SolanaQRCodeProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    const encodedUrl = encodeURL(
-      {
-        link: new URL(url, window.location.href),
-      },
-      "solana:",
-    );
+    setIsLoading(true);
+    setError(null);
 
-    console.log("encodedUrl:", encodedUrl.toString());
+    try {
+      const encodedUrl = encodeURL(
+        {
+          link: new URL(url, window.location.href),
+        },
+        "solana:"
+      );
 
-    const qr = createSolanaQR(encodedUrl, size, background, color);
+      console.log("encodedUrl:", encodedUrl.toString());
 
-    if (ref.current && !ref.current.innerHTML) {
-      qr.append(ref.current);
+      const qr = createSolanaQR(encodedUrl, size, background, color);
+
+      if (ref.current) {
+        ref.current.innerHTML = '';
+        qr.append(ref.current);
+      }
+    } catch (err) {
+      console.error("Error creating Solana QR code:", err);
+      setError("Failed to generate QR code. Please check the provided URL.");
+    } finally {
+      setIsLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url]);
+  }, [url, size, background, color]);
 
-  return <div ref={ref} className={className} />;
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
+  }
+
+  return (
+    <>
+      {isLoading && <Skeleton className={`w-${size} h-${size}`} />}
+      <div ref={ref} className={className} style={{ display: isLoading ? 'none' : 'block' }} />
+    </>
+  );
 }
+

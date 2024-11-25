@@ -8,7 +8,7 @@ import { BarChart3Icon, HeartHandshakeIcon, ZapIcon, UsersIcon, WalletIcon, Glob
 const features = [
   {
     name: 'Blinks',
-    description: 'Ignite change with instant micro-payments, donations. Create, share, and track your Blinks to make immediate impact.',
+    description: 'Ignite change with instant micro-payments and donations. Create, share, and track your Blinks to make immediate impact.',
     icon: ZapIcon,
   },
   {
@@ -40,7 +40,7 @@ const features = [
 
 const Features = memo(function Features() {
   return (
-    <section className="py-16 bg-gradient-to-br from-[#D0BFB4]/5 to-transparent" id="features" aria-labelledby="features-heading">
+    <section className="py-16" id="features" aria-labelledby="features-heading">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           className="text-center mb-12"
@@ -63,7 +63,7 @@ const Features = memo(function Features() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card className="h-full transition-all duration-300 group bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-[0_4px_10px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_20px_rgba(208,191,180,0.2),0_6px_6px_rgba(208,191,180,0.1)] hover:translate-y-[-2px]" style={{ transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)' }}>
+              <Card className="h-full transition-all duration-300 group bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-lg hover:translate-y-[-2px]">
                 <CardContent className="p-6 sm:p-8 flex flex-col h-full">
                   <div className="flex items-center mb-4">
                     <div className="p-2 rounded-full bg-brown-[#D0BFB4]/10 mr-3 transition-colors duration-300 group-hover:bg-brown-[#D0BFB4]/20">
@@ -79,6 +79,13 @@ const Features = memo(function Features() {
                   <p className="text-base text-muted-foreground transition-colors duration-300 flex-grow mt-2 group-hover:text-foreground">
                     {feature.description}
                   </p>
+                  <motion.div 
+                    className="mt-4 text-sm font-medium text-[#D0BFB4] hover:text-brown-[#D2BFB4] dark:hover:text-[#E5D3C8] cursor-pointer"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Learn more →
+                  </motion.div>
                 </CardContent>
               </Card>
             </motion.div>

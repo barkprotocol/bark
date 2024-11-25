@@ -36,6 +36,7 @@ const navItems: NavItem[] = [
       { name: 'Payments', href: '/payments' },
       { name: 'marketplace', href: '/marketplace' },
       { name: 'clubs', href: '/clubs' },
+      { name: 'Governance', href: '/governance' },
     ]
   },
 ]
@@ -62,8 +63,8 @@ export function Header() {
   const headerClasses = cn(
     'fixed top-0 left-0 right-0 z-50 transition-all duration-200',
     {
-      'bg-background/80 backdrop-blur-sm shadow-md': isScrolled,
-      'bg-transparent': !isScrolled
+      'bg-white dark:bg-black shadow-md': isScrolled,
+      'bg-white/80 dark:bg-black/80 backdrop-blur-sm': !isScrolled
     }
   )
 
@@ -101,7 +102,7 @@ export function Header() {
 }
 
 function NavItem({ item, pathname }: { item: NavItem; pathname: string }) {
-  const linkClasses = "transition-colors duration-300 flex items-center text-base font-medium text-foreground hover:text-primary"
+  const linkClasses = "transition-colors duration-300 flex items-center text-base font-medium text-gray-800 dark:text-gray-200 hover:text-[#BBA597] dark:hover:text-[#BBA597]"
 
   if (item.children) {
     return (
@@ -110,10 +111,10 @@ function NavItem({ item, pathname }: { item: NavItem; pathname: string }) {
           {item.name}
           <ChevronDown className="ml-2 h-4 w-4" aria-hidden="true" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="bg-background/80 backdrop-blur-sm border border-border">
+        <DropdownMenuContent className="bg-white dark:bg-black border border-gray-200 dark:border-gray-800">
           {item.children.map((child) => (
             <DropdownMenuItem key={child.name} asChild>
-              <Link href={child.href} className="text-foreground hover:text-primary block px-4 py-2">
+              <Link href={child.href} className="text-gray-800 dark:text-gray-200 hover:text-[#BBA597] dark:hover:text-[#BBA597] block px-4 py-2">
                 {child.name}
               </Link>
             </DropdownMenuItem>
@@ -134,7 +135,7 @@ function MobileMenuToggle({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (
   return (
     <button
       onClick={() => setIsOpen(!isOpen)}
-      className="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-foreground hover:text-primary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+      className="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-800 dark:text-gray-200 hover:text-[#BBA597] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#BBA597]"
       aria-expanded={isOpen}
       aria-controls="mobile-menu"
       aria-label={isOpen ? 'Close main menu' : 'Open main menu'}
@@ -157,7 +158,7 @@ function MobileMenu({ navItems, pathname, isOpen, setIsOpen }: { navItems: NavIt
         isOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
       )}
     >
-      <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-background/80 backdrop-blur-sm">
+      <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-black">
         {navItems.map((item) => (
           <MobileNavItem key={item.name} item={item} pathname={pathname} setIsOpen={setIsOpen} />
         ))}
@@ -172,7 +173,7 @@ function MobileMenu({ navItems, pathname, isOpen, setIsOpen }: { navItems: NavIt
 }
 
 function MobileNavItem({ item, pathname, setIsOpen }: { item: NavItem; pathname: string; setIsOpen: (isOpen: boolean) => void }) {
-  const linkClasses = "block px-3 py-2 rounded-md text-base font-medium text-foreground hover:text-primary"
+  const linkClasses = "block px-3 py-2 rounded-md text-base font-medium text-gray-800 dark:text-gray-200 hover:text-[#BBA597] dark:hover:text-[#BBA597]"
 
   if (item.children) {
     return (
@@ -181,10 +182,10 @@ function MobileNavItem({ item, pathname, setIsOpen }: { item: NavItem; pathname:
           {item.name}
           <ChevronDown className="ml-1 h-4 w-4" aria-hidden="true" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="bg-background/80 backdrop-blur-sm border border-border">
+        <DropdownMenuContent className="bg-white dark:bg-black border border-gray-200 dark:border-gray-800">
           {item.children.map((child) => (
             <DropdownMenuItem key={child.name} asChild>
-              <Link href={child.href} className="text-foreground hover:text-primary block px-4 py-2" onClick={() => setIsOpen(false)}>
+              <Link href={child.href} className="text-gray-800 dark:text-gray-200 hover:text-[#BBA597] dark:hover:text-[#BBA597] block px-4 py-2" onClick={() => setIsOpen(false)}>
                 {child.name}
               </Link>
             </DropdownMenuItem>
@@ -207,7 +208,7 @@ function LaunchAppButton() {
       asChild 
       variant="default" 
       size="icon"
-      className="bg-primary text-primary-foreground hover:bg-primary/90"
+      className="bg-[#BBA597] text-white hover:bg-[#A8917F] transition-colors duration-300"
     >
       <Link href="https://app.barkprotocol.net" aria-label="Launch App">
         <Rocket className="h-[1.2rem] w-[1.2rem]" />

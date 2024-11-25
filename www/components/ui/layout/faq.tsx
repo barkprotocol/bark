@@ -65,18 +65,18 @@ export default function FAQ() {
   }
 
   return (
-    <section className="w-full max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-      <h2 className="text-4xl sm:text-5xl font-bold text-center text-foreground mb-4">Frequently Asked Questions</h2>
-      <p className="text-xl text-center text-muted-foreground mb-12 max-w-3xl mx-auto">
+    <section className="w-full max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <h1 className="text-3xl sm:text-4xl font-bold text-center text-foreground mb-3">Frequently Asked Questions</h1>
+      <p className="text-lg text-center text-muted-foreground mb-10 max-w-3xl mx-auto">
         Find answers to common questions about BARK Protocol, its features, and how to get started.
       </p>
       <Card className="w-full bg-white dark:bg-gray-950 shadow-lg">
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-6">
           <Accordion
             type="multiple"
             value={expandedItems}
             onValueChange={setExpandedItems}
-            className="w-full space-y-6"
+            className="w-full space-y-4"
           >
             {faqItems.map((item, index) => (
               <AccordionItem 
@@ -86,14 +86,14 @@ export default function FAQ() {
               >
                 <AccordionTrigger
                   onClick={() => toggleItem(`item-${index}`)}
-                  className="text-left text-lg font-medium py-4 px-6 text-foreground hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition"
+                  className="text-left text-base sm:text-lg font-medium py-3 px-4 sm:px-6 text-foreground hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition"
                 >
-                  <span className="font-semibold text-xl">{item.question}</span>
+                  <span className="font-semibold">{item.question}</span>
                 </AccordionTrigger>
-                <AccordionContent className="px-6 py-4 bg-gray-50 dark:bg-gray-900">
+                <AccordionContent className="px-4 sm:px-6 py-3 bg-gray-50 dark:bg-gray-900">
                   <div className="mt-2 space-y-2">
                     <div 
-                      className="prose prose-sm max-w-none text-muted-foreground dark:text-muted-foreground"
+                      className="prose prose-sm max-w-none text-sm sm:text-base text-muted-foreground dark:text-muted-foreground"
                       dangerouslySetInnerHTML={{ 
                         __html: item.answer.replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#D0BFB4]">$1</strong>')
                                               .replace(/\n\s*-\s*/g, '<br>• ')
@@ -109,3 +109,4 @@ export default function FAQ() {
     </section>
   )
 }
+
