@@ -8,12 +8,8 @@ const formSchema = z.object({
   message: z.string().min(10),
 })
 
-export async function sendEmail(formData: FormData) {
-  const validatedFields = formSchema.safeParse({
-    name: formData.get('name'),
-    email: formData.get('email'),
-    message: formData.get('message'),
-  })
+export async function sendEmail(formData: z.infer<typeof formSchema>) {
+  const validatedFields = formSchema.safeParse(formData)
 
   if (!validatedFields.success) {
     return { error: 'Invalid form data' }
