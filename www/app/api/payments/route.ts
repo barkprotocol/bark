@@ -1,58 +1,61 @@
 import { NextResponse } from 'next/server'
-import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL, clusterApiUrl } from '@solana/web3.js'
-import { SOLANA_NETWORK, MERCHANT_WALLET_ADDRESS, CURRENCY_OPTIONS } from '@/utils/payments/constants'
-import { TokenProgram, Token, u64 } from '@solana/spl-token'
+import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js'
+import { TOKEN_PROGRAM_ID, createTransferInstruction, getAssociatedTokenAddress } from '@solana/spl-token'
+import { 
+  SOLANA_NETWORK, 
+  MERCHANT_WALLET_ADDRESS, 
+  BARK_TOKEN_MINT, 
+  USDC_MINT,
+  TOKEN_INFO
+} from '@/utils/payments/constants'
 
 export async function POST(request: Request) {
   try {
-    const { amount, currency, buyerPublicKey } = await request.json()
+    const { amount, fromToken, buyerPublicKey } = await request.json()
 
     // Validate input
-    if (!amount || !currency || !buyerPublicKey) {
-      return NextResponse.json({ error: 'Invalid input: amount, currency, and buyerPublicKey are required' }, { status: 400 })
+    if (!amount || !fromToken || !buyerPublicKey) {
+      return NextResponse.json({ error: 'Invalid input: amount, fromToken, and buyerPublicKey are required' }, { status: 400 })
     }
 
-    if (!CURRENCY_OPTIONS.includes(currency)) {
-      return NextResponse.json({ error: 'Invalid currency' }, { status: 400 })
+    if (!['SOL', 'USDC'].includes(fromToken)) {
+      return NextResponse.json({ error: 'Invalid fromToken. Must be SOL or USDC' }, { status: 400 })
     }
 
     // Connect to Solana network
-    const connection = new Connection(clusterApiUrl(SOLANA_NETWORK), 'confirmed')
+    const connection = new Connection(SOLANA_NETWORK, 'confirmed')
 
     let transaction: Transaction
 
-    if (currency === 'sol') {
+    if (fromToken === 'SOL') {
       // Create SOL transfer transaction
       transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: new PublicKey(buyerPublicKey),
           toPubkey: new PublicKey(MERCHANT_WALLET_ADDRESS),
-          lamports: amount * LAMPORTS_PER_SOL,
+          lamports: Math.floor(amount * LAMPORTS_PER_SOL),
         })
       )
     } else {
-      // For other currencies (USDC, BARK), create SPL token transfer transaction
-      const tokenMintAddress = getTokenMintAddress(currency)
-      const tokenProgramId = TokenProgram.programId
-      const fromTokenAccount = await Token.getAssociatedTokenAddress(
-        tokenProgramId,
-        new PublicKey(tokenMintAddress),
+      // For USDC, create SPL token transfer transaction
+      const tokenMintAddress = USDC_MINT
+      const fromTokenAccount = await getAssociatedTokenAddress(
+        tokenMintAddress,
         new PublicKey(buyerPublicKey)
       )
-      const toTokenAccount = await Token.getAssociatedTokenAddress(
-        tokenProgramId,
-        new PublicKey(tokenMintAddress),
+      const toTokenAccount = await getAssociatedTokenAddress(
+        tokenMintAddress,
         new PublicKey(MERCHANT_WALLET_ADDRESS)
       )
 
       transaction = new Transaction().add(
-        Token.createTransferInstruction(
-          tokenProgramId,
+        createTransferInstruction(
           fromTokenAccount,
           toTokenAccount,
           new PublicKey(buyerPublicKey),
+          Math.floor(amount * (10 ** TOKEN_INFO[fromToken].decimals)),
           [],
-          new u64(amount * (10 ** getTokenDecimals(currency)))
+          TOKEN_PROGRAM_ID
         )
       )
     }
@@ -71,32 +74,20 @@ export async function POST(request: Request) {
     // Convert to base64
     const base64Transaction = serializedTransaction.toString('base64')
 
-    // Return the serialized transaction
-    return NextResponse.json({ transaction: base64Transaction })
+    // Generate a unique transaction ID
+    const transactionId = generateTransactionId()
+
+    // Return the serialized transaction and transaction ID
+    return NextResponse.json({ 
+      transaction: base64Transaction,
+      transactionId: transactionId,
+    })
   } catch (error) {
     console.error('Payment processing error:', error)
     return NextResponse.json({ error: 'Payment processing failed', details: (error as Error).message }, { status: 500 })
   }
 }
 
-function getTokenMintAddress(currency: string): string {
-  switch (currency) {
-    case 'usdc':
-      return 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' // USDC token mint address on mainnet
-    case 'bark':
-      return '2NTvEssJ2i998V2cMGT4Fy3JhyFnAzHFonDo9dbAkVrg'
-    default:
-      throw new Error('Invalid currency for token transfer')
-  }
-}
-
-function getTokenDecimals(currency: string): number {
-  switch (currency) {
-    case 'usdc':
-      return 6
-    case 'bark':
-      return 9 // BARK uses 9 decimals
-    default:
-      throw new Error('Invalid currency for token transfer')
-  }
+function generateTransactionId(): string {
+  return 'txn_' + Math.random().toString(36).substr(2, 9)
 }

@@ -87,7 +87,7 @@ const MilestoneCard: React.FC<{ milestone: Milestone }> = ({ milestone }) => {
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">{milestone.description}</p>
-        <StatusIcon className={`mt-2 h-5 w-5 ${milestone.status === 'completed' ? 'text-green-500' : milestone.status === 'in-progress' ? 'text-brown-[#D0BFB4]' : 'text-blue-500'}`} />
+        <StatusIcon className={`mt-2 h-5 w-5 ${milestone.status === 'completed' ? 'text-green-500' : milestone.status === 'in-progress' ? 'text-[#D0BFB4]' : 'text-blue-500'}`} />
       </CardContent>
     </Card>
   )

@@ -76,7 +76,7 @@ export default function TokenSale() {
         <h2 id="token-sale-title" className="sr-only">Token Sale Information</h2>
         
         <Alert variant="warning">
-          <AlertTriangle className="h-4 w-4 text-brown-[#D0BFB4]" />
+          <AlertTriangle className="h-4 w-4 text-[#D0BFB4]" />
           <AlertTitle>Important Notice</AlertTitle>
           <AlertDescription>
             Token sales are subject to eligibility requirements and regulatory compliance. Please ensure you meet all criteria before participating.
@@ -87,7 +87,7 @@ export default function TokenSale() {
           <Card key={index} className="w-full transition-all duration-300 hover:shadow-lg">
             <CardHeader>
               <CardTitle className="text-2xl font-bold flex items-center">
-                <Coins className="mr-2 h-6 w-6 text-brown-[#D0BFB4]" aria-hidden="true" />
+                <Coins className="mr-2 h-6 w-6 text-[#D0BFB4]" aria-hidden="true" />
                 {stage.name}
               </CardTitle>
             </CardHeader>
@@ -132,13 +132,13 @@ export default function TokenSale() {
 
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-2">
                 <div className="flex items-center">
-                  <Calendar className="mr-2 h-4 w-4 text-brown-[#D0BFB4]" aria-hidden="true" />
+                  <Calendar className="mr-2 h-4 w-4 text-[#D0BFB4]" aria-hidden="true" />
                   <span className="text-sm text-muted-foreground">
                     {formatDate(stage.startDate)} - {formatDate(stage.endDate)}
                   </span>
                 </div>
                 <div className="flex items-center">
-                  <Users className="mr-2 h-4 w-4 text-brown-[#D0BFB4]" aria-hidden="true" />
+                  <Users className="mr-2 h-4 w-4 text-[#D0BFB4]" aria-hidden="true" />
                   <span className="text-sm text-muted-foreground">
                     {stage.raised > 0 ? '2,500+ participants' : 'Not started'}
                   </span>
@@ -163,7 +163,7 @@ export default function TokenSale() {
 
         <div className="mt-8">
           <h3 className="text-xl font-semibold mb-4 flex items-center">
-            <Info className="mr-2 h-5 w-5 text-brown-[#D0BFB4]" aria-hidden="true" />
+            <Info className="mr-2 h-5 w-5 text-[#D0BFB4]" aria-hidden="true" />
             Additional Information
           </h3>
           <ul className="list-disc list-inside space-y-2 text-muted-foreground">

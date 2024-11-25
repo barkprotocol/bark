@@ -60,7 +60,7 @@ export default function AboutUs() {
             >
               <Card className="h-full transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105">
                 <CardContent className="p-5">
-                  <feature.icon className="h-6 w-6 text-brown-[#D0BFB4] mb-3" aria-hidden="true" />
+                  <feature.icon className="h-6 w-6 text-[#D0BFB4] mb-3" aria-hidden="true" />
                   <h3 className="text-lg font-semibold mb-2 text-foreground">{feature.title}</h3>
                   <p className="text-sm text-muted-foreground">{feature.description}</p>
                 </CardContent>

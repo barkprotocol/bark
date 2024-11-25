@@ -62,7 +62,7 @@ const HowItWorks: React.FC = () => {
             >
               <Card className="h-full transition-all duration-300 hover:shadow-lg">
                 <CardHeader>
-                  <feature.icon className="h-8 w-8 text-brown-[#D0BFB4] mb-2" />
+                  <feature.icon className="h-8 w-8 text-[#D0BFB4] mb-2" />
                   <CardTitle className="text-xl font-semibold">{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -96,14 +96,14 @@ const HowItWorks: React.FC = () => {
           <CardContent>
             <ul className="space-y-4">
               <li className="flex items-start">
-                <Lock className="h-6 w-6 text-brown-[#D0BFB4] mr-2 flex-shrink-0 mt-1" />
+                <Lock className="h-6 w-6 text-[#D0BFB4] mr-2 flex-shrink-0 mt-1" />
                 <div>
                   <h3 className="font-semibold text-lg">Escrow Services</h3>
                   <p className="text-muted-foreground">BARK utilizes smart contract-based escrow services for secure and trustless transactions, especially useful for large donations or cross-border charitable contributions.</p>
                 </div>
               </li>
               <li className="flex items-start">
-                <CreditCard className="h-6 w-6 text-brown-[#D0BFB4] mr-2 flex-shrink-0 mt-1" />
+                <CreditCard className="h-6 w-6 text-[#D0BFB4] mr-2 flex-shrink-0 mt-1" />
                 <div>
                   <h3 className="font-semibold text-lg">Payment Solutions</h3>
                   <p className="text-muted-foreground">Integrated payment gateways allow for seamless conversion between BARKs and fiat currencies, facilitating easy donations and payouts to charitable organizations.</p>

@@ -92,7 +92,7 @@ export default function BrandGuidePage() {
                       className={`w-full justify-start ${activeTab === section.id ? 'bg-accent text-accent-foreground' : ''}`}
                       onClick={() => setActiveTab(section.id)}
                     >
-                      <section.icon className="mr-2 h-5 w-5 text-brown-[#D0BFB4]" />
+                      <section.icon className="mr-2 h-5 w-5 text-[#D0BFB4]" />
                       {section.title}
                     </Button>
                   </li>

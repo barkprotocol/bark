@@ -37,7 +37,7 @@ export default function FeatureCards() {
           <Card className="w-full h-full shadow-lg hover:shadow-xl transition-shadow duration-300 bg-gray-900">
             <CardHeader>
               <div className="flex justify-center mb-4">
-                <feature.icon className="w-12 h-12 text-brown-[#D0BFB4]" aria-hidden="true" />
+                <feature.icon className="w-12 h-12 text-[#D0BFB4]" aria-hidden="true" />
               </div>
               <CardTitle className="text-xl font-bold text-white">{feature.title}</CardTitle>
             </CardHeader>

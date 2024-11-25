@@ -1,339 +1,175 @@
 'use client'
 
-import React, { useState, useMemo, lazy, Suspense } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Coins, Users, Code, Droplet, Megaphone, ShieldCheck, PieChartIcon, BarChartIcon, Lock, Zap, DollarSign, ExternalLink, VoteIcon, AlertTriangle, BarChart2, Search, TrendingUp } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import ErrorBoundary from '@/components/error-boundary'
-import { TokenDetailsCard, TokenDetail } from '@/components/ui/layout/token-details-card'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronDown, PawPrint } from 'lucide-react'
+import { useInView } from 'react-intersection-observer'
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 
-// Lazy-loaded components
-const EmissionChart = lazy(() => import('@/components/ui/tokenenomics/emission-chart'))
-const DistributionPieChart = lazy(() => import('@/components/ui/tokenenomics/distribution-pie-chart'))
-const VestingSchedule = lazy(() => import('@/components/ui/tokenenomics/vesting-schedule'))
-const Governance = lazy(() => import('@/components/ui/tokenenomics/governance'))
-const TokenSales = lazy(() => import('@/components/ui/tokenenomics/token-sales'))
-const AnalyticsSection = lazy(() => import('@/components/ui/token/analytics'))
-const DexInfo = lazy(() => import('@/components/ui/tokenenomics/dex-info'))
+export function Hero() {
+  const [showBackground, setShowBackground] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageError, setImageError] = useState(false)
 
-// Types
-type TabContentKey = 'overview' | 'distribution' | 'vesting' | 'emission' | 'tokensales' | 'dex' | 'governance' | 'analytics'
+  const { ref: scrollRef, inView } = useInView({
+    threshold: 0.1,
+    triggerOnce: true,
+  })
 
-interface TokenDistribution {
-  name: string
-  value: number
-  color: string
-  icon: React.ElementType
-}
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackground(window.scrollY > 50)
+    }
 
-interface EmissionSchedule {
-  year: number
-  emission: number
-  totalSupply: number
-}
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
-// Data
-const tokenDistribution: TokenDistribution[] = [
-  { name: 'Community', value: 30, color: '#FFECB1', icon: Users },
-  { name: 'Development', value: 20, color: '#FFD466', icon: Code },
-  { name: 'Team', value: 15, color: '#FFBD1B', icon: Users },
-  { name: 'Liquidity', value: 20, color: '#E6A600', icon: Droplet },
-  { name: 'Ecosystem & Marketing', value: 10, color: '#B38300', icon: Megaphone },
-  { name: 'Reserve', value: 5, color: '#805D00', icon: ShieldCheck },
-]
+  const handleImageLoad = useCallback(() => {
+    setImageLoaded(true)
+    setImageError(false)
+  }, [])
 
-const emissionSchedule: EmissionSchedule[] = [
-  { year: 2024, emission: 372800000, totalSupply: 19012800000 },
-  { year: 2025, emission: 365344000, totalSupply: 19378144000 },
-  { year: 2026, emission: 358036920, totalSupply: 19736180920 },
-  { year: 2027, emission: 350876182, totalSupply: 20087057102 },
-  { year: 2028, emission: 343858658, totalSupply: 20430915760 },
-]
+  const handleImageError = useCallback(() => {
+    setImageError(true)
+    setImageLoaded(true)
+  }, [])
 
-const TokenomicsCard: React.FC<{ title: string; value: string; description: string; icon: React.ElementType }> = ({ title, value, description, icon: Icon }) => {
   return (
-    <Card className="h-full transition-all duration-300 hover:shadow-lg bg-white dark:bg-gray-950">
-      <CardHeader className="p-4">
-        <CardTitle className="text-lg font-semibold flex items-center text-foreground dark:text-white">
-          <Icon className="w-6 h-6 mr-2 text-brown-500" aria-hidden="true" />
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-4 pt-0">
-        <p className="text-2xl font-bold mb-1">{value}</p>
-        <p className="text-sm text-muted-foreground">{description}</p>
-      </CardContent>
-    </Card>
-  )
-}
-
-const VestingScheduleCard: React.FC<{ title: string; schedule: string; icon: React.ElementType }> = ({ title, schedule, icon: Icon }) => {
-  return (
-    <Card className="transition-all duration-300 hover:shadow-lg bg-white dark:bg-gray-950">
-      <CardContent className="p-4">
-        <div className="flex items-center mb-2">
-          <Icon className="w-6 h-6 mr-2 text-brown-500" aria-hidden="true" />
-          <h4 className="text-lg font-semibold text-foreground dark:text-white">{title}</h4>
+    <section className="relative w-full h-screen flex flex-col justify-center items-center overflow-hidden" aria-labelledby="hero-heading">
+      <div className="absolute inset-0 z-0">
+        {!imageError && (
+          <Image
+            src="https://ucarecdn.com/60f6ce5e-1757-4d1e-a9a2-a895bbfcab84/barkesters.png"
+            alt="Barkersters, representing the power and innovation of BARK"
+            fill
+            quality={85}
+            priority
+            sizes="100vw"
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+          />
+        )}
+      </div>
+      
+      {!imageLoaded && (
+        <div className="absolute inset-0 bg-gray-900 z-10 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-brown-[#D0BFB4]"></div>
         </div>
-        <p className="text-sm">{schedule}</p>
-      </CardContent>
-    </Card>
-  )
-}
+      )}
 
-const Overview: React.FC = () => {
-  const tokenDetails: TokenDetail[] = [
-    { label: 'Name', value: 'BARK' },
-    { label: 'Symbol', value: 'BARK' },
-    { label: 'Decimals', value: '9' },
-    { label: 'Blockchain', value: 'Solana' },
-    { label: 'Token Type(s)', value: 'SPL & Token-2022' },
-  ]
-
-  return (
-    <>
-      <h3 className="text-2xl font-bold mb-6 text-foreground dark:text-white">Overview</h3>
-      <div className="mb-6 text-muted-foreground">
-        <p>
-          BARK is designed to be the backbone of our ecosystem, facilitating charitable giving, disaster relief, and community-driven initiatives. With built-in mechanisms for{' '}
-          <Tooltip>
-            <TooltipTrigger className="underline cursor-help">staking</TooltipTrigger>
-            <TooltipContent>
-              Staking involves locking up BARK tokens (BARK) to support network operations and earn rewards.
-            </TooltipContent>
-          </Tooltip>
-          ,{' '}
-          <Tooltip>
-            <TooltipTrigger className="underline cursor-help">governance</TooltipTrigger>
-            <TooltipContent>
-              Token holders can participate in decision-making processes that shape the future of the project.
-            </TooltipContent>
-          </Tooltip>
-          , and sustainable growth, BARK Protocol aims to create long-term value for holders while making a positive impact on the world.
-        </p>
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <TokenDetailsCard title="Token Details" details={tokenDetails} />
-        <Card className="transition-all duration-300 hover:shadow-lg bg-white dark:bg-gray-950">
-          <CardContent className="p-6">
-            <h4 className="text-xl font-semibold mb-4 text-foreground dark:text-white">Key Features</h4>
-            <ul className="space-y-3">
-              <li className="flex items-start">
-                <Zap className="w-5 h-5 mr-2 text-brown-500 flex-shrink-0 mt-1" aria-hidden="true" />
-                <span><strong>Staking Rewards:</strong> <span className="font-normal">Up to 8% APY for token stakers</span></span>
-              </li>
-              <li className="flex items-start">
-                <Coins className="w-5 h-5 mr-2 text-brown-500 flex-shrink-0 mt-1" aria-hidden="true" />
-                <span><strong>Burn Mechanism:</strong> <span className="font-normal">1% of all transaction fees are burned</span></span>
-              </li>
-              <li className="flex items-start">
-                <VoteIcon className="w-5 h-5 mr-2 text-brown-500 flex-shrink-0 mt-1" aria-hidden="true" />
-                <span><strong>Governance:</strong> <span className="font-normal">Token holders can participate in DAO voting</span></span>
-              </li>
-              <li className="flex items-start">
-                <Droplet className="w-5 h-5 mr-2 text-brown-500 flex-shrink-0 mt-1" aria-hidden="true" />
-                <span><strong>Use Cases:</strong> <span className="font-normal">Governance, staking, DeFi integrations, charity</span></span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-      </div>
-    </>
-  )
-}
-
-const Distribution: React.FC = () => {
-  return (
-    <>
-      <h3 className="text-2xl font-bold mb-6 text-foreground dark:text-white">Distribution</h3>
-      <DistributionPieChart data={tokenDistribution} title="Allocation" />
-    </>
-  )
-}
-
-const Vesting: React.FC = () => {
-  return (
-    <>
-      <h3 className="text-2xl font-bold mb-6 text-foreground dark:text-white">Vesting Schedule</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        {[
-          { title: "Community", schedule: "25% unlocked at TGE, remaining vested over 24 months", icon: Users },
-          { title: "Development", schedule: "10% unlocked at TGE, remaining vested over 36 months", icon: Code },
-          { title: "Team", schedule: "12-month cliff, then vested over 36 months", icon: Users },
-          { title: "Liquidity", schedule: "50% unlocked at TGE, remaining vested over 12 months", icon: Droplet },
-          { title: "Ecosystem & Marketing", schedule: "20% unlocked at TGE, remaining vested over 24 months", icon: Megaphone },
-          { title: "Reserve", schedule: "Locked for 6 months, then vested over 24 months", icon: ShieldCheck }
-        ].map((item, index) => (
-          <VestingScheduleCard key={index} title={item.title} schedule={item.schedule} icon={item.icon} />
-        ))}
-      </div>
-      <VestingSchedule />
-    </>
-  )
-}
-
-const Emission: React.FC = () => {
-  return (
-    <>
-      <h3 className="text-2xl font-bold mb-6 text-foreground dark:text-white">Emission Rates</h3>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <Card className="transition-all duration-300 hover:shadow-lg bg-white dark:bg-gray-950">
-          <CardContent className="p-4">
-            <h4 className="text-lg font-semibold mb-2 flex items-center text-foreground dark:text-white">
-              <Coins className="w-5 h-5 mr-2 text-brown-500" aria-hidden="true" />
-              Initial Supply
-            </h4>
-            <p className="text-md">18,271,889,396.27 BARK</p>
-          </CardContent>
-        </Card>
-        <Card className="transition-all duration-300 hover:shadow-lg bg-white dark:bg-gray-950">
-          <CardContent className="p-4">
-            <h4 className="text-lg font-semibold mb-2 flex items-center text-foreground dark:text-white">
-              <Zap className="w-5 h-5 mr-2 text-brown-500" aria-hidden="true" />
-              Annual Inflation Rate
-            </h4>
-            <p className="text-md">Starting at 2%, decreasing by 0.25% each year</p>
-          </CardContent>
-        </Card>
-        <Card className="transition-all duration-300 hover:shadow-lg bg-white dark:bg-gray-950">
-          <CardContent className="p-4">
-            <h4 className="text-lg font-semibold  mb-2 flex items-center text-foreground dark:text-white">
-              <PieChartIcon className="w-5 h-5 mr-2 text-brown-500" aria-hidden="true" />
-              Emission Distribution
-            </h4>
-            <p className="text-md">50% staking rewards, 30% ecosystem, 20% community</p>
-          </CardContent>
-        </Card>
-      </div>
-      <EmissionChart data={emissionSchedule} title="Emission Schedule" />
-    </>
-  )
-}
-
-const TokenSalesInfo: React.FC = () => {
-  return (
-    <>
-      <h3 className="text-2xl font-bold mb-6 text-foreground dark:text-white">Token Sales Information</h3>
-      <TokenSales />
-    </>
-  )
-}
-
-const GovernanceInfo: React.FC = () => {
-  return (
-    <>
-      <h3 className="text-2xl font-bold mb-6 text-foreground dark:text-white">Autonomous Organization (DAO)</h3>
-      <Governance />
-    </>
-  )
-}
-
-export default function Tokenomics() {
-  const [activeTab, setActiveTab] = useState<TabContentKey>('overview')
-
-  const handleTabChange = (value: TabContentKey) => {
-    setActiveTab(value)
-  }
-
-  const tabContent = useMemo(() => ({
-    overview: <Overview />,
-    distribution: <Distribution />,
-    vesting: <Vesting />,
-    emission: <Emission />,
-    tokensales: <TokenSalesInfo />,
-    dex: <Suspense fallback={<div>Loading DEX information...</div>}><DexInfo /></Suspense>,
-    governance: <GovernanceInfo />,
-    analytics: <Suspense fallback={<div>Loading Analytics...</div>}><AnalyticsSection /></Suspense>,
-  }), [])
-
-  const tabConfig = [
-    { value: 'overview', icon: BarChartIcon, label: 'Overview' },
-    { value: 'distribution', icon: PieChartIcon, label: 'Distribution' },
-    { value: 'vesting', icon: Lock, label: 'Vesting' },
-    { value: 'emission', icon: Zap, label: 'Emission' },
-    { value: 'tokensales', icon: DollarSign, label: 'Token Sales' },
-    { value: 'dex', icon: ExternalLink, label: 'DEX' },
-    { value: 'governance', icon: VoteIcon, label: 'Governance' },
-    { value: 'analytics', icon: TrendingUp, label: 'Analytics' },
-  ]
-
-  return (
-    <Tooltip
->
-      <section className="py-16" id="tokenomics" aria-label="Tokenomics">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            className="text-center mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+      <div className="absolute inset-0 bg-black/60 z-10" aria-hidden="true" />
+      
+      <AnimatePresence>
+        {showBackground && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.8 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
+            className="absolute inset-0 bg-black z-20"
+            aria-hidden="true"
+          />
+        )}
+      </AnimatePresence>
+      
+      <motion.div 
+        ref={scrollRef}
+        initial={{ opacity: 0, y: 20 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 1 }}
+        className="relative z-30 flex flex-col items-center gap-4 sm:gap-6 w-full px-4 sm:px-6 lg:px-8"
+      >
+        <Badge variant="secondary" className="px-2 py-1 text-xs sm:text-sm md:text-base uppercase tracking-wider bg-brown-[#D0BFB4]/20 text-brown-[#E5D3C8] font-medium rounded-full shadow-lg backdrop-blur-sm">
+          <PawPrint className="w-4 h-4 inline-block mr-1" />
+          Introducing BARK Protocol
+        </Badge>
+        
+        <motion.h1 
+          id="hero-heading"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight tracking-tighter text-center text-white mb-2 sm:mb-4"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={inView ? { scale: 1, opacity: 1 } : {}}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          style={{
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          Redefining Social Finance
+        </motion.h1>
+        
+        <motion.p 
+          className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white font-medium mb-2 sm:mb-4 text-center max-w-4xl mx-auto"
+          initial={{ opacity: 0, y: 10 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.4, duration: 0.8 }}
+          style={{
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.8)'
+          }}
+        >
+          Driving impactful donations, disaster relief, and community empowerment through blockchain innovation.
+        </motion.p>
+
+        <motion.p
+          className="text-sm sm:text-base md:text-lg text-white/80 max-w-3xl mx-auto mb-6 sm:mb-8 text-center"
+          initial={{ opacity: 0, y: 10 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.6, duration: 0.8 }}
+          style={{
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.6)'
+          }}
+        >
+          BARK Protocol leverages Solana blinks, governance, and decentralized technology to build a transparent, secure, and community-driven ecosystem. Together, we're shaping a future of meaningful impact and transformation.
+        </motion.p>
+        
+        <motion.div 
+          className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center w-full"
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.8, duration: 0.8 }}
+        >
+          <Button
+            asChild
+            size="lg"
+            className="w-full sm:w-auto px-6 sm:px-8 py-3 text-sm sm:text-base font-semibold group bg-white text-gray-800 hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-[0_4px_14px_0_rgba(255,255,255,0.5)] hover:shadow-[0_6px_20px_rgba(255,255,255,0.35)] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
           >
-            <h2 className="text-3xl font-extrabold text-foreground dark:text-white sm:text-4xl lg:text-5xl mb-4">
-              Tokenomics
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Discover the economic model powering BARK's ecosystem and learn how it drives value for token holders and the community.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            <TokenomicsCard
-              title="Total Supply"
-              value="18,640,000,000"
-              description="The maximum number of BARK tokens at launch"
-              icon={Coins}
-            />
-            <TokenomicsCard
-              title="Initial Circulating Supply"
-              value="11,500,000,000"
-              description="BARK tokens available in the market at TGE"
-              icon={Coins}
-            />
-            <TokenomicsCard
-              title="Token Standard"
-              value="SPL"
-              description="Built on Solana for fast, efficient transactions"
-              icon={Coins}
-            />
-          </div>
-
-          <ErrorBoundary fallback={<div>An error occurred while loading the tokenomics information.</div>}>
-            <Card className="mb-12 transition-all duration-300 hover:shadow-xl bg-white dark:bg-gray-950">
-              <CardContent className="p-6">
-                <Tabs defaultValue="overview" onValueChange={(value) => handleTabChange(value as TabContentKey)}>
-                  <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 bg-gray-100 dark:bg-gray-900 dark:text-gray-100 mb-8 overflow-x-auto">
-                    {tabConfig.map(({ value, icon: Icon, label }) => (
-                      <TabsTrigger key={value} value={value} className={`flex items-center justify-center p-2 ${activeTab === value ? 'bg-primary text-primary-foreground' : ''}`}>
-                        <Icon className="w-5 h-5 text-brown-500 lg:mr-2" aria-hidden="true" />
-                        <span className="hidden lg:inline">{label}</span>
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={activeTab}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <TabsContent value={activeTab}>
-                        <Suspense fallback={<div className="text-center">Loading...</div>}>
-                          {tabContent[activeTab]}
-                        </Suspense>
-                      </TabsContent>
-                    </motion.div>
-                  </AnimatePresence>
-                </Tabs>
-              </CardContent>
-            </Card>
-          </ErrorBoundary>
-        </div>
-      </section>
-    </Tooltip>
+            <Link href="/pages/get-started" className="flex items-center justify-center">
+              Get Started
+              <motion.span
+                className="ml-2"
+                initial={{ x: -10, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 10, opacity: 0 }}
+              >
+                →
+              </motion.span>
+            </Link>
+          </Button>
+          <Button 
+            asChild 
+            size="lg" 
+            variant="outline" 
+            className="w-full sm:w-auto px-6 sm:px-8 py-3 text-sm sm:text-base font-semibold group bg-transparent text-white hover:text-gray-200 border-2 border-white/50 hover:border-white transition-all duration-300 transform hover:scale-105 shadow-[0_4px_14px_0_rgba(255,255,255,0.3)] hover:shadow-[0_6px_20px_rgba(255,255,255,0.2)] rounded-md focus:outline-none focus:ring-2 focus:ring-white/75"
+          >
+            <Link href="/pages/whitepaper" className="flex items-center justify-center">
+              Whitepaper
+              <motion.span
+                className="ml-2 opacity-0 transition-opacity duration-300 ease-in-out"
+                initial={{ x: -10, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 10, opacity: 0 }}
+              >
+                →
+              </motion.span>
+            </Link>
+          </Button>
+        </motion.div>
+      </motion.div>
+    </section>
   )
 }
+

@@ -1,9 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import { PublicKey } from '@solana/web3.js'
-import { createQR } from '@solana/pay'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,37 +10,34 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, Copy, RefreshCw, CreditCard, InfoIcon, Send, QrCode } from 'lucide-react'
 import { WalletButton } from '@/components/ui/wallet-button'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Progress } from '@/components/ui/progress'
-
-const BARK_TOKEN_MINT = new PublicKey('4DsZctdxSVNLGYB5YtY8A8JDg6tUoSZnQHSamXecKWWf')
-const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
+import { BARK_TOKEN_MINT, USDC_MINT, TOKEN_INFO, QR_CODE_EXPIRATION_TIME } from '@/utils/payments/constants'
+import { createPayment, verifyPayment, getTokenIconUrl } from '@/utils/payments/api'
+import { generateQRCode } from '@/utils/payments/solana-pay'
 
 const tokenInfo = {
   SOL: {
     name: 'Solana',
     symbol: 'SOL',
-    icon: 'https://ucarecdn.com/8bcc4664-01b2-4a88-85bc-9ebce234f08b/sol.png?height=24&width=24',
     decimals: 9,
   },
   USDC: {
     name: 'USD Coin',
     symbol: 'USDC',
-    icon: 'https://ucarecdn.com/67e17a97-f3bd-46c0-8627-e13b8b939d26/usdc.png?height=24&width=24',
     decimals: 6,
     mint: USDC_MINT,
   },
   BARK: {
     name: 'BARK',
     symbol: 'BARK',
-    icon: 'https://ucarecdn.com/bbc74eca-8e0d-4147-8a66-6589a55ae8d0/bark.webp?height=24&width=24',
     decimals: 9,
     mint: BARK_TOKEN_MINT,
   },
 }
 
-export default function BuyContent() {
+export function BuyContent() {
   const [amount, setAmount] = useState<string>('')
   const [fromToken, setFromToken] = useState<'SOL' | 'USDC'>('SOL')
   const [toToken, setToToken] = useState<'BARK'>('BARK')
@@ -55,6 +50,15 @@ export default function BuyContent() {
   const { connection } = useConnection()
   const wallet = useWallet()
 
+  const handleReset = useCallback(() => {
+    setQrCode(null)
+    setReference(null)
+    setTransactionSignature(null)
+    setAmount('')
+    setTimeLeft(300)
+    setError(null)
+  }, [])
+
   useEffect(() => {
     let timer: NodeJS.Timeout
     if (reference && timeLeft > 0) {
@@ -65,7 +69,7 @@ export default function BuyContent() {
       handleReset()
     }
     return () => clearInterval(timer)
-  }, [reference, timeLeft])
+  }, [reference, timeLeft, handleReset])
 
   const handleGenerateQR = async () => {
     if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
@@ -77,31 +81,24 @@ export default function BuyContent() {
     setError(null)
 
     try {
-      const response = await fetch('/api/storm/payments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          buyerPublicKey: wallet.publicKey?.toBase58(),
-          amount: parseFloat(amount),
-          fromToken,
-        }),
+      const { transactionId, signature } = await createPayment({
+        buyerPublicKey: wallet.publicKey?.toBase58() || '',
+        amount: parseFloat(amount),
+        fromToken,
       })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create payment')
-      }
+      setReference(transactionId)
+      setTransactionSignature(signature)
 
-      const data = await response.json()
-      setReference(data.transactionId)
-      setTransactionSignature(data.signature)
+      const qrCodeUrl = await generateQRCode({
+        signature,
+        transactionId,
+        amount,
+        fromToken,
+      })
 
-      // Generate Solana Pay QR code
-      const url = `solana:${data.signature}?reference=${data.transactionId}&amount=${amount}&spl-token=${tokenInfo[fromToken].mint}`
-      const qr = createQR(url)
-      const qrCodeSrc = await qr.getRawData('png')
-      setQrCode(URL.createObjectURL(new Blob([qrCodeSrc!], { type: 'image/png' })))
-      setTimeLeft(300) // Reset countdown to 5 minutes
+      setQrCode(qrCodeUrl)
+      setTimeLeft(QR_CODE_EXPIRATION_TIME)
     } catch (error) {
       console.error('Error generating QR code:', error)
       setError(error.message || 'Failed to generate QR code. Please try again.')
@@ -120,12 +117,7 @@ export default function BuyContent() {
     setError(null)
 
     try {
-      const response = await fetch(`/api/storm-protocol/payments?transactionId=${reference}&action=verify`)
-      if (!response.ok) {
-        throw new Error('Failed to verify payment')
-      }
-
-      const { status } = await response.json()
+      const { status } = await verifyPayment({ transactionId: reference })
       alert(`Payment status: ${status}`)
 
       if (status === 'completed') {
@@ -137,15 +129,6 @@ export default function BuyContent() {
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const handleReset = () => {
-    setQrCode(null)
-    setReference(null)
-    setTransactionSignature(null)
-    setAmount('')
-    setTimeLeft(300)
-    setError(null)
   }
 
   const handleCopyReference = () => {
@@ -200,13 +183,13 @@ export default function BuyContent() {
                       <SelectContent>
                         <SelectItem value="SOL">
                           <div className="flex items-center">
-                            <Image src={tokenInfo.SOL.icon} alt="SOL" width={24} height={24} className="mr-2" />
+                            <Image src={getTokenIconUrl('SOL')} alt="SOL" width={24} height={24} className="mr-2" />
                             SOL
                           </div>
                         </SelectItem>
                         <SelectItem value="USDC">
                           <div className="flex items-center">
-                            <Image src={tokenInfo.USDC.icon} alt="USDC" width={24} height={24} className="mr-2" />
+                            <Image src={getTokenIconUrl('USDC')} alt="USDC" width={24} height={24} className="mr-2" />
                             USDC
                           </div>
                         </SelectItem>
@@ -231,7 +214,7 @@ export default function BuyContent() {
                       <SelectContent>
                         <SelectItem value="BARK">
                           <div className="flex items-center">
-                            <Image src={tokenInfo.BARK.icon} alt="BARK" width={24} height={24} className="mr-2" />
+                            <Image src={getTokenIconUrl('BARK')} alt="BARK" width={24} height={24} className="mr-2" />
                             BARK
                           </div>
                         </SelectItem>
@@ -275,19 +258,17 @@ export default function BuyContent() {
                         >
                           View on Solscan
                         </a>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button size="sm" variant="outline" onClick={handleSendPaymentDetails}>
-                                <Send className="h-4 w-4 text-brown-[#D0BFB4]" />
-                                <span className="sr-only">Send payment details</span>
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Send payment details via email</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button size="sm" variant="outline" onClick={handleSendPaymentDetails}>
+                              <Send className="h-4 w-4 text-brown-[#D0BFB4]" />
+                              <span className="sr-only">Send payment details</span>
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Send payment details via email</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     )}
                   </div>
@@ -307,7 +288,7 @@ export default function BuyContent() {
             <div className="flex justify-center">
               <WalletButton />
             </div>
-            <Alert className="bg-gray-50 dark:bg-gray-700 border-yellow-300 dark:border-brown-[#D2BFB4]">
+            <Alert className="bg-gray-50 dark:bg-gray-700 border-yellow-300 dark:border-yellow-600">
               <InfoIcon className="h-4 w-4 text-brown-[#D0BFB4]" />
               <AlertTitle>Important</AlertTitle>
               <AlertDescription>
@@ -338,7 +319,7 @@ export default function BuyContent() {
             <CardContent>
               <div className="flex items-center space-x-4 mb-4">
                 <Image
-                  src="https://ucarecdn.com/bbc74eca-8e0d-4147-8a66-6589a55ae8d0/bark.webp"
+                  src="https://ucarecdn.com/47ae5354-d470-439b-97b2-3c08d4b14120/stormlogoicon.png"
                   alt="BARK Token"
                   width={64}
                   height={64}
@@ -353,7 +334,7 @@ export default function BuyContent() {
                 <li><strong>Name:</strong> BARK</li>
                 <li><strong>Symbol:</strong> BARK</li>
                 <li><strong>Decimals:</strong> 9</li>
-                <li><strong>Total Supply:</strong> 18,640,000,000 BARK</li>
+                <li><strong>Total Supply:</strong> 18,271,889,396.27 BARK</li>
                 <li><strong>Contract Address:</strong> 
                   <a
                     href={`https://solscan.io/token/${BARK_TOKEN_MINT.toBase58()}`}
@@ -380,7 +361,7 @@ export default function BuyContent() {
                 <li>Access to exclusive DeFi products on the BARK platform</li>
                 <li>Participate in governance decisions shaping the future of BARK</li>
                 <li>Earn rewards through staking and liquidity provision</li>
-                <li>Trade with reduced fees on the BARK DEX</li>
+                <li>Trade with reduced fees on the DEX</li>
                 <li>Potential for value appreciation as the ecosystem grows</li>
               </ul>
             </CardContent>
@@ -390,3 +371,4 @@ export default function BuyContent() {
     </div>
   )
 }
+

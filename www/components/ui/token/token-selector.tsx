@@ -74,7 +74,7 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({ onTokenChange }) => {
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-xl font-semibold flex items-center">
-          <Coins className="w-5 h-5 mr-2 text-brown-[#D0BFB4]" aria-hidden="true" />
+          <Coins className="w-5 h-5 mr-2 text-[#D0BFB4]" aria-hidden="true" />
           Select BARK Token
         </CardTitle>
       </CardHeader>
@@ -123,7 +123,7 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({ onTokenChange }) => {
                 href={selectedToken.explorerLink} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-brown-[#D0BFB4] hover:underline flex items-center"
+                className="text-[#D0BFB4] hover:underline flex items-center"
               >
                 View on Explorer
                 <ExternalLink className="w-4 h-4 ml-1" />

@@ -12,6 +12,7 @@ import { Footer } from "@/components/ui/layout/footer";
 // Providers
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { WalletContextProvider } from "@/components/ui/wallet-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 // Styles
 import "./styles/globals.css";
@@ -41,16 +42,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             enableSystem
             disableTransitionOnChange
           >
-            <div className="flex flex-col min-h-screen">
-              <Header />
-              <main className="flex-1 w-full max-w-[1920px] mx-auto px-2 sm:px-0 lg:px-0 pt-20" role="main">
-                {children}
-              </main>
-              <Footer />
-            </div>
+            <TooltipProvider>
+              <div className="flex flex-col min-h-screen">
+                <Header />
+                <main className="flex-1 w-full max-w-[1920px] mx-auto px-2 sm:px-2 lg:px-0 pt-20" role="main">
+                  {children}
+                </main>
+                <Footer />
+              </div>
+            </TooltipProvider>
           </ThemeProvider>
         </WalletContextProvider>
       </body>
     </html>
   );
 }
+

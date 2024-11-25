@@ -64,9 +64,9 @@ const VestingSchedule: React.FC = () => {
     <Card className="w-full h-[600px]">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-center flex items-center justify-center">
-          <Lock className="mr-2 h-6 w-6 text-brown-[#D0BFB4]" aria-hidden="true" />
+          <Lock className="mr-2 h-6 w-6 text-[#D0BFB4]" aria-hidden="true" />
           Token Vesting Schedule
-          <Unlock className="ml-2 h-6 w-6 text-brown-[#D0BFB4]" aria-hidden="true" />
+          <Unlock className="ml-2 h-6 w-6 text-[#D0BFB4]" aria-hidden="true" />
         </CardTitle>
       </CardHeader>
       <CardContent>

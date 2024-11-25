@@ -46,10 +46,10 @@ export default function GovernanceOverview({ proposals }: GovernanceOverviewProp
               key={stat.title} 
               className="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl"
             >
-              <stat.icon className="w-8 h-8 mb-2 text-brown-[#D0BFB4]" aria-hidden="true" />
+              <stat.icon className="w-8 h-8 mb-2 text-[#D0BFB4]" aria-hidden="true" />
               <h3 className="text-lg font-semibold mb-1 text-gray-800 dark:text-white">{stat.title}</h3>
               <p 
-                className="text-3xl font-bold text-brown-[#D0BFB4]" 
+                className="text-3xl font-bold text-[#D0BFB4]" 
                 aria-label={`${stat.title}: ${stat.value}`}
               >
                 {stat.value}

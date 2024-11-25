@@ -213,7 +213,7 @@ export default function CreateCNFTPage() {
             className="mb-4"
           >
             <Alert className="bg-white border border-brown-[#D0BFB4] dark:bg-card">
-              <Info className="h-4 w-4 text-brown-[#D0BFB4]" />
+              <Info className="h-4 w-4 text-[#D0BFB4]" />
               <AlertTitle>Important Information</AlertTitle>
               <AlertDescription>
                 Creating a Compressed NFT involves a service fee of {SERVICE_FEE_PERCENTAGE}% plus Solana network fees.

@@ -36,7 +36,7 @@ export default function Governance() {
           <Card className="bg-gray-100 dark:bg-gray-800">
             <CardHeader>
               <CardTitle className="flex items-center text-xl font-semibold">
-                <VoteIcon className="w-6 h-6 mr-2 text-brown-[#D0BFB4]" aria-hidden="true" />
+                <VoteIcon className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
                 Voting Power
               </CardTitle>
             </CardHeader>
@@ -52,7 +52,7 @@ export default function Governance() {
           <Card className="bg-gray-100 dark:bg-gray-800">
             <CardHeader>
               <CardTitle className="flex items-center text-xl font-semibold">
-                <Users className="w-6 h-6 mr-2 text-brown-[#D0BFB4]" aria-hidden="true" />
+                <Users className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
                 Proposal Creation
               </CardTitle>
             </CardHeader>
@@ -68,7 +68,7 @@ export default function Governance() {
           <Card className="bg-gray-100 dark:bg-gray-800">
             <CardHeader>
               <CardTitle className="flex items-center text-xl font-semibold">
-                <Clock className="w-6 h-6 mr-2 text-brown-[#D0BFB4]" aria-hidden="true" />
+                <Clock className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
                 Voting Process
               </CardTitle>
             </CardHeader>
@@ -85,7 +85,7 @@ export default function Governance() {
           <Card className="bg-gray-100 dark:bg-gray-800">
             <CardHeader>
               <CardTitle className="flex items-center text-xl font-semibold">
-                <Shield className="w-6 h-6 mr-2 text-brown-[#D0BFB4]" aria-hidden="true" />
+                <Shield className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
                 Security Measures
               </CardTitle>
             </CardHeader>
@@ -102,7 +102,7 @@ export default function Governance() {
         <Card className="bg-gray-100 dark:bg-gray-800 mt-8">
           <CardHeader>
             <CardTitle className="flex items-center text-xl font-semibold">
-              <Zap className="w-6 h-6 mr-2 text-brown-[#D0BFB4]" aria-hidden="true" />
+              <Zap className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
               Governance Incentives
             </CardTitle>
           </CardHeader>

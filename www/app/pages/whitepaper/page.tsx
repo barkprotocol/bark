@@ -87,12 +87,12 @@ export default function WhitepaperPage() {
         <CardContent>
           <div className="flex justify-center space-x-4 mb-6">
             <Button variant="outline" onClick={handleDownloadPDF}>
-              <Download className="mr-2 h-4 w-4 text-brown-[#D0BFB4]" />
+              <Download className="mr-2 h-4 w-4 text-[#D0BFB4]" />
               Download PDF
             </Button>
             <Button variant="outline" asChild>
               <Link href="https://github.com/storm-protocol/" target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 h-4 w-4 text-brown-[#D0BFB4]" />
+                <ExternalLink className="mr-2 h-4 w-4 text-[#D0BFB4]" />
                 View on GitHub
               </Link>
             </Button>
@@ -109,7 +109,7 @@ export default function WhitepaperPage() {
                       className={`text-sm hover:underline flex items-center ${activeTab === section.id ? 'font-bold' : ''}`}
                       onClick={() => setActiveTab(section.id)}
                     >
-                      <section.icon className="mr-2 h-4 w-4 text-brown-[#D0BFB4]" />
+                      <section.icon className="mr-2 h-4 w-4 text-[#D0BFB4]" />
                       {section.title}
                     </Link>
                   </li>

@@ -3,7 +3,7 @@
 import React, { lazy, Suspense } from 'react'
 import { useTheme } from 'next-themes'
 import { Loader2 } from 'lucide-react'
-import Hero from "@/components/ui/layout/hero"
+import { Hero } from "@/components/ui/layout/hero"
 
 const About = lazy(() => import('@/components/ui/layout/about'))
 const Features = lazy(() => import('@/components/ui/layout/features'))
@@ -47,3 +47,4 @@ export default function Home() {
     </div>
   )
 }
+

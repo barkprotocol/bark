@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { BarChart2, ExternalLink, LineChart, TrendingUp, DollarSign, Eye, Search, Activity } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getCurrentPrice, get24HourChange, get7DayChange, getTotalVolume, getMarketCap } from "@/utils/bark-price-data"
+import { getCurrentPrice, get24HourChange, get7DayChange, getTotalVolume, getMarketCap } from "@/utils/market-data/bark-price-data"
 
 const analyticsLinks = [
   {
@@ -128,7 +128,7 @@ export default function AnalyticsSection() {
                         alt={`${platform.name} icon`}
                         width={20}
                         height={20}
-                        className="text-brown-[#D0BFB4]"
+                        className="text-[#D0BFB4]"
                       />
                     </div>
                     <CardTitle className="text-xl font-semibold text-foreground dark:text-white">
@@ -154,7 +154,7 @@ export default function AnalyticsSection() {
                 <Button 
                   asChild 
                   variant="outline" 
-                  className="w-full bg-transparent hover:bg-brown-[#D0BFB4]/10 border-brown-[#D0BFB4] text-brown-[#D0BFB4] hover:text-brown-[#D0BFB4] transition-colors duration-300"
+                  className="w-full bg-transparent hover:bg-brown-[#D0BFB4]/10 border-brown-[#D0BFB4] text-[#D0BFB4] hover:text-[#D0BFB4] transition-colors duration-300"
                 >
                   <Link 
                     href={platform.link} 

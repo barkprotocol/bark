@@ -264,7 +264,7 @@ export default function CrowdfundingPage() {
       case 'Disaster Relief':
         return <AlertTriangle className="h-5 w-5 text-red-500" />
       default:
-        return <DollarSign className="h-5 w-5 text-brown-[#D0BFB4]" />
+        return <DollarSign className="h-5 w-5 text-[#D0BFB4]" />
     }
   }
 

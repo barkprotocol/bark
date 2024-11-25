@@ -4,7 +4,7 @@ import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ArrowDownIcon, ArrowUpIcon, TrendingUpIcon, DollarSignIcon, CoinsIcon } from 'lucide-react'
-import { getCurrentPrice, get24HourChange, get7DayChange, getTotalVolume, getMarketCap } from "@/utils/bark-price-data"
+import { getCurrentPrice, get24HourChange, get7DayChange, getTotalVolume, getMarketCap } from "@/utils/market-data/bark-price-data"
 
 const MarketOverview: React.FC = () => {
   const currentPrice = getCurrentPrice()

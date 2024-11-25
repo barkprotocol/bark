@@ -12,7 +12,7 @@ import MarketOverview from '@/components/ui/tokenenomics/market-overview'
 import TokenSelector, { TokenOption } from '@/components/ui/token/token-selector'
 import Link from 'next/link'
 import Image from 'next/image'
-import { fetchCoinMarketCapData, fetchCoinGeckoData } from '@/utils/api'
+import { fetchCoinMarketCapData, fetchCoinGeckoData } from '@/utils/market-data/api'
 
 export const metadata: Metadata = {
   title: 'BARK Analytics',
@@ -56,7 +56,7 @@ export const TokenDetailsCard: React.FC<TokenDetailsCardProps> = ({ title, detai
                   href={detail.link} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-brown-[#D0BFB4] hover:underline flex items-center"
+                  className="text-[#D0BFB4] hover:underline flex items-center"
                 >
                   {detail.value}
                   <ExternalLink className="w-4 h-4 ml-1" />

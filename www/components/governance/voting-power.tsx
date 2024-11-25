@@ -36,10 +36,10 @@ export default function VotingPower() {
         <Progress value={(votePower / maxVotePower) * 100} className="w-full" />
         <div className="flex justify-between space-x-4">
           <Button onClick={handleDecrease} variant="outline" className="flex-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 border-gray-300 dark:border-gray-600">
-            <ArrowDown className="mr-2 h-4 w-4 text-brown-[#D0BFB4]" /> Decrease
+            <ArrowDown className="mr-2 h-4 w-4 text-[#D0BFB4]" /> Decrease
           </Button>
           <Button onClick={handleIncrease} variant="outline" className="flex-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 border-gray-300 dark:border-gray-600">
-            <ArrowUp className="mr-2 h-4 w-4 text-brown-[#D0BFB4]" /> Increase
+            <ArrowUp className="mr-2 h-4 w-4 text-[#D0BFB4]" /> Increase
           </Button>
         </div>
         <Button onClick={handleReset} variant="secondary" className="w-full bg-gray-900 text-white hover:bg-gray-800">

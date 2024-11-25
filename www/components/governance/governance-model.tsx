@@ -36,7 +36,7 @@ export function GovernanceModel() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {governanceFeatures.map((feature, index) => (
                 <div key={index} className="flex items-start space-x-4">
-                  <feature.icon className="w-8 h-8 text-brown-[#D0BFB4] mt-1" />
+                  <feature.icon className="w-8 h-8 text-[#D0BFB4] mt-1" />
                   <div>
                     <h3 className="font-semibold text-lg text-gray-900">{feature.title}</h3>
                     <p className="text-gray-600">{feature.description}</p>
@@ -58,7 +58,7 @@ export function GovernanceModel() {
             <ol className="space-y-4">
               {participationSteps.map((step, index) => (
                 <li key={index} className="flex items-start space-x-4">
-                  <CheckCircle className="w-6 h-6 text-brown-[#D0BFB4] mt-1" />
+                  <CheckCircle className="w-6 h-6 text-[#D0BFB4] mt-1" />
                   <span className="text-gray-700">{step}</span>
                 </li>
               ))}

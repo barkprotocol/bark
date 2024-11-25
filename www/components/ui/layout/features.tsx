@@ -40,7 +40,7 @@ const features = [
 
 const Features = memo(function Features() {
   return (
-    <section className="py-16 bg-gradient-to-br from-brown-[#D0BFB4]/5 to-transparent" id="features" aria-labelledby="features-heading">
+    <section className="py-16 bg-gradient-to-br from-[#D0BFB4]/5 to-transparent" id="features" aria-labelledby="features-heading">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           className="text-center mb-12"
@@ -68,11 +68,11 @@ const Features = memo(function Features() {
                   <div className="flex items-center mb-4">
                     <div className="p-2 rounded-full bg-brown-[#D0BFB4]/10 mr-3 transition-colors duration-300 group-hover:bg-brown-[#D0BFB4]/20">
                       <feature.icon 
-                        className="h-6 w-6 text-brown-[#D0BFB4] transition-colors duration-300 group-hover:text-brown-[#D2BFB4] dark:group-hover:text-brown-[#D0BFB4]" 
+                        className="h-6 w-6 text-[#D0BFB4] transition-colors duration-300 group-hover:text-brown-[#D2BFB4] dark:group-hover:text-[#D0BFB4]" 
                         aria-hidden="true" 
                       />
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground transition-colors duration-300 group-hover:text-brown-[#D2BFB4] dark:group-hover:text-brown-[#D0BFB4]">
+                    <h3 className="text-lg font-semibold text-foreground transition-colors duration-300 group-hover:text-brown-[#D2BFB4] dark:group-hover:text-[#D0BFB4]">
                       {feature.name}
                     </h3>
                   </div>

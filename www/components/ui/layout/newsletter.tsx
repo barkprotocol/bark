@@ -57,7 +57,7 @@ export default function Newsletter() {
       <div className="container mx-auto px-6 sm:px-8 lg:px-8">
         <Card className="w-full bg-white dark:bg-gray-950 shadow-lg rounded-md">
           <CardHeader className="flex flex-col items-center">
-            <Bell className="w-10 h-10 text-brown-[#D0BFB4] mb-4" />
+            <Bell className="w-10 h-10 text-[#D0BFB4] mb-4" />
             <CardTitle className="text-4xl font-bold text-center text-gray-900 dark:text-white">
               Stay in the Loop
             </CardTitle>
@@ -68,7 +68,7 @@ export default function Newsletter() {
             </p>
             <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 items-center justify-center">
               <div className="relative w-full sm:w-64">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-brown-[#D0BFB4] w-4 h-4" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#D0BFB4] w-4 h-4" />
                 <Input
                   type="email"
                   placeholder="Your email address"
@@ -86,19 +86,19 @@ export default function Newsletter() {
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin text-brown-[#D0BFB4]" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin text-[#D0BFB4]" />
                     Subscribing...
                   </>
                 ) : (
                   <>
-                    <Send className="mr-2 h-4 w-4 text-brown-[#D0BFB4]" />
+                    <Send className="mr-2 h-4 w-4 text-[#D0BFB4]" />
                     Subscribe
                   </>
                 )}
               </Button>
             </form>
             <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-4">
-              By subscribing, you agree to our <a href="/privacy-policy" className="underline hover:text-brown-[#D0BFB4] transition-colors duration-200">Privacy Policy</a> and <a href="/terms-of-service" className="underline hover:text-brown-[#D0BFB4] transition-colors duration-200">Terms of Service</a>.
+              By subscribing, you agree to our <a href="/privacy-policy" className="underline hover:text-[#D0BFB4] transition-colors duration-200">Privacy Policy</a> and <a href="/terms-of-service" className="underline hover:text-[#D0BFB4] transition-colors duration-200">Terms of Service</a>.
             </p>
           </CardContent>
         </Card>

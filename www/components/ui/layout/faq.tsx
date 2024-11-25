@@ -95,7 +95,7 @@ export default function FAQ() {
                     <div 
                       className="prose prose-sm max-w-none text-muted-foreground dark:text-muted-foreground"
                       dangerouslySetInnerHTML={{ 
-                        __html: item.answer.replace(/\*\*(.*?)\*\*/g, '<strong class="text-brown-[#D0BFB4]">$1</strong>')
+                        __html: item.answer.replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#D0BFB4]">$1</strong>')
                                               .replace(/\n\s*-\s*/g, '<br>• ')
                       }} 
                     />

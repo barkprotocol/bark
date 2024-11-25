@@ -526,7 +526,7 @@ export default function Dashboard() {
                           <p className="text-sm text-gray-500 dark:text-gray-400">{blink.likes} likes • {blink.views} views</p>
                         </div>
                       </div>
-                      <Trophy className={`h-5 w-5 ${index === 0 ? 'text-brown-[#D0BFB4]' : index === 1 ? 'text-gray-400' : index === 2 ? 'text-yellow-700' : 'text-gray-300'}`} aria-hidden="true" />
+                      <Trophy className={`h-5 w-5 ${index === 0 ? 'text-[#D0BFB4]' : index === 1 ? 'text-gray-400' : index === 2 ? 'text-yellow-700' : 'text-gray-300'}`} aria-hidden="true" />
                     </div>
                   ))}
                 </div>

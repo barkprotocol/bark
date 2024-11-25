@@ -34,7 +34,7 @@ const DexCard: React.FC<DexInfo> = ({ name, link, description, icon }) => {
           <Button asChild variant="outline" size="sm">
             <Link href={link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center">
               Visit {name}
-              <ExternalLink className="ml-2 h-4 w-4 text-brown-[#D0BFB4]" aria-hidden="true" />
+              <ExternalLink className="ml-2 h-4 w-4 text-[#D0BFB4]" aria-hidden="true" />
             </Link>
           </Button>
         </CardContent>
@@ -47,7 +47,7 @@ const DexCard: React.FC<DexInfo> = ({ name, link, description, icon }) => {
       <>
         <h3 className="text-2xl font-bold mb-6 text-foreground dark:text-white">Decentralized Exchanges</h3>
         <Alert className="mb-6 text-sm">
-          <AlertTriangle className="h-4 w-4 text-brown-[#D0BFB4]" aria-hidden="true" />
+          <AlertTriangle className="h-4 w-4 text-[#D0BFB4]" aria-hidden="true" />
           <AlertTitle className="text-base font-semibold text-foreground dark:text-white">Initial Liquidity Notice</AlertTitle>
           <AlertDescription>
             Initial liquidity will be provided to ensure a smooth trading experience. The BARK Protocol is committed to maintaining healthy liquidity across multiple DEXes to support token utility and accessibility.
@@ -61,7 +61,7 @@ const DexCard: React.FC<DexInfo> = ({ name, link, description, icon }) => {
         <Card className="transition-all duration-300 hover:shadow-lg bg-white dark:bg-gray-950">
           <CardContent className="p-6">
             <h4 className="text-xl font-semibold mb-4 flex items-center text-foreground dark:text-white">
-              <Droplet className="w-6 h-6 mr-2 text-brown-[#D0BFB4]" aria-hidden="true" />
+              <Droplet className="w-6 h-6 mr-2 text-[#D0BFB4]" aria-hidden="true" />
               Liquidity Management Strategy
             </h4>
             <ul className="list-disc list-inside space-y-2 text-muted-foreground">

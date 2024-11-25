@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { getCurrentPrice } from "@/utils/bark-price-data"
+import { getCurrentPrice } from "@/utils/market-data/bark-price-data"
 
 const Calculator: React.FC = () => {
   const [barkAmount, setBarkAmount] = useState<string>('')

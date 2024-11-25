@@ -62,7 +62,7 @@ export const AccountOverview: React.FC = () => {
         <p className="text-sm text-gray-700">Total Balance: ${accountData.totalBalance.toFixed(2)}</p>
       </div>
       <div className="flex items-center mb-2">
-        <FaGem className="text-brown-[#D0BFB4] mr-2" />
+        <FaGem className="text-[#D0BFB4] mr-2" />
         <p className="text-sm text-gray-700">Staked NFTs: {accountData.stakedNFTs}</p>
       </div>
       <div className="flex items-center">

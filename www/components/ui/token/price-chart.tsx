@@ -3,7 +3,7 @@
 import React from 'react'
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { barkPriceData } from "@/utils/bark-price-data"
+import { barkPriceData } from "@/utils/market-data/bark-price-data"
 
 const PriceChart: React.FC = () => {
   return (

@@ -17,7 +17,7 @@ export const TokenDetailsCard: React.FC<TokenDetailsCardProps> = ({ title, detai
     <Card className="transition-all duration-300 hover:shadow-lg bg-white dark:bg-gray-950">
       <CardHeader className="pb-2">
         <CardTitle className="text-xl font-semibold text-foreground dark:text-white flex items-center">
-          <Coins className="w-5 h-5 mr-2 text-brown-[#D0BFB4]" aria-hidden="true" />
+          <Coins className="w-5 h-5 mr-2 text-[#D0BFB4]" aria-hidden="true" />
           {title}
         </CardTitle>
       </CardHeader>

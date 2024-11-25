@@ -33,7 +33,7 @@ export default function CTA() {
               >
                 <Link href="/buy" className="flex items-center justify-center">
                   <span className="text-base">Buy BARK</span>
-                  <Coins className="ml-2 h-5 w-5 text-brown-[#D0BFB4]" aria-hidden="true" />
+                  <Coins className="ml-2 h-5 w-5 text-[#D0BFB4]" aria-hidden="true" />
                 </Link>
               </Button>
               <Button 
@@ -44,7 +44,7 @@ export default function CTA() {
               >
                 <Link href="/about" className="flex items-center justify-center">
                   <span className="text-base">Learn More</span>
-                  <ArrowRight className="ml-2 h-5 w-5 text-brown-[#D0BFB4]" aria-hidden="true" />
+                  <ArrowRight className="ml-2 h-5 w-5 text-[#D0BFB4]" aria-hidden="true" />
                 </Link>
               </Button>
             </div>

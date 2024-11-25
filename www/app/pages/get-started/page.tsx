@@ -345,7 +345,7 @@ function renderStepFooter(stepId: string) {
     case 'wallet':
       return (
         <Alert variant="warning">
-          <AlertTriangle className="h-4 w-4 text-brown-[#D0BFB4]" />
+          <AlertTriangle className="h-4 w-4 text-[#D0BFB4]" />
           <AlertTitle>Important</AlertTitle>
           <AlertDescription>
             Never share your wallet's private key or seed phrase with anyone. Keep it safe and secure.
@@ -355,7 +355,7 @@ function renderStepFooter(stepId: string) {
     case 'acquire':
       return (
         <Alert variant="warning">
-          <AlertCircle className="h-4 w-4 text-brown-[#D0BFB4]" />
+          <AlertCircle className="h-4 w-4 text-[#D0BFB4]" />
           <AlertTitle>Note</AlertTitle>
           <AlertDescription>
             Always verify the contract address when acquiring BARK tokens to ensure you're getting genuine tokens. When using the swap app, make sure you're connected to the correct network.
@@ -365,7 +365,7 @@ function renderStepFooter(stepId: string) {
     case 'stake':
       return (
         <Alert variant="warning">
-          <AlertTriangle className="h-4 w-4 text-brown-[#D0BFB4]" />
+          <AlertTriangle className="h-4 w-4 text-[#D0BFB4]" />
           <AlertTitle>Important</AlertTitle>
           <AlertDescription>
             Staked tokens are locked for a certain period. Make sure you understand the terms before staking.
