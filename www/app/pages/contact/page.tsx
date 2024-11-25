@@ -122,7 +122,7 @@ export default function ContactPage() {
               />
               <Button 
                 type="submit" 
-                className="w-full bg-gray-950 hover:bg-gray-1000 text-white"
+                className="w-full bg-gray-900 hover:bg-gray-800 text-white"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
@@ -140,3 +140,4 @@ export default function ContactPage() {
     </div>
   )
 }
+

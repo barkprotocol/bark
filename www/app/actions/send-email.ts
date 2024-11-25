@@ -3,16 +3,24 @@
 import { z } from 'zod'
 
 const formSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  message: z.string().min(10),
+  name: z.string().min(2, {
+    message: "Name must be at least 2 characters.",
+  }),
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+  message: z.string().min(10, {
+    message: "Message must be at least 10 characters.",
+  }),
 })
 
 export async function sendEmail(formData: z.infer<typeof formSchema>) {
   const validatedFields = formSchema.safeParse(formData)
 
   if (!validatedFields.success) {
-    return { error: 'Invalid form data' }
+    return { 
+      error: validatedFields.error.issues.map(issue => issue.message).join(', ')
+    }
   }
 
   const { name, email, message } = validatedFields.data
@@ -39,13 +47,14 @@ export async function sendEmail(formData: z.infer<typeof formSchema>) {
     })
 
     if (!response.ok) {
-      throw new Error('Failed to send email')
+      const errorData = await response.json().catch(() => null)
+      throw new Error(errorData?.message || 'Failed to send email')
     }
 
     return { success: true }
   } catch (error) {
     console.error('Error sending email:', error)
-    return { error: 'Failed to send email' }
+    return { error: error instanceof Error ? error.message : 'Failed to send email' }
   }
 }
 
