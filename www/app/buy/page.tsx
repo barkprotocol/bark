@@ -1,13 +1,16 @@
 import { Metadata } from 'next'
-import { Suspense } from 'react'
-import { BuyContent } from '@/components/payments/buy-content'
-import { ErrorBoundary } from '@/components/ui/error-boundary'
-import { LoadingSpinner } from '@/components/ui/spinner'
 
 export const metadata: Metadata = {
   title: 'Buy BARK Tokens | BARK Protocol',
-  description: 'Purchase SPL tokens securely using SOL or USDC on the BARK Protocol platform.',
+  description: 'Purchase SPL tokens securely using SOL or USDC on the BARK Protocol application.',
 }
+
+'use client'
+
+import { Suspense } from 'react'
+import { BuyContent } from '@/components/payments/buy-content'
+import ErrorBoundary from '@/components/ui/error-boundary'
+import { LoadingSpinner } from '@/components/ui/spinner'
 
 export default function BuyPage() {
   return (
