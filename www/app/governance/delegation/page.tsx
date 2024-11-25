@@ -14,9 +14,9 @@ type Delegation = {
   }
   
   const initialDelegations: Delegation[] = [
-    { address: '7fgX8bktP...9ZhyDnc', amount: 50000, date: '2024-12-01' },
-    { address: '3jQx7Ap2R...Km4FvLq', amount: 75000, date: '2024-12-15' },
-    { address: '9tNx5Qw8E...Hs2PzXy', amount: 100000, date: '2024-11-01' },
+    { address: '7fgX8bktP...9ZhyDnc', amount: 50000, date: '2023-06-01' },
+    { address: '3jQx7Ap2R...Km4FvLq', amount: 75000, date: '2023-06-15' },
+    { address: '9tNx5Qw8E...Hs2PzXy', amount: 100000, date: '2023-07-01' },
   ]
   
   export default function DelegationPage() {
@@ -71,4 +71,4 @@ type Delegation = {
         </div>
       </DashboardLayout>
     )
-  }
+  }  
